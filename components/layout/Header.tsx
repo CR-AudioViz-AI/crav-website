@@ -79,31 +79,31 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      {/* SINGLE ROW: Logo (left) | Navigation (center) | Auth (right) */}
+      {/* ROW 1: Logo + Navigation Links */}
       <div className="border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-24 lg:h-28">
+          <div className="flex items-center justify-between h-32 lg:h-36">
             
-            {/* Logo - MUCH LARGER */}
+            {/* Logo - DOUBLE SIZE */}
             <Link href="/" className="flex items-center flex-shrink-0">
               <Image
                 src="/craudiovizailogo.png"
                 alt="CR AudioViz AI"
-                width={600}
-                height={180}
-                className="h-20 lg:h-24 w-auto"
+                width={800}
+                height={240}
+                className="h-28 lg:h-32 w-auto"
                 priority
               />
             </Link>
 
-            {/* Desktop Navigation - CENTERED with better spacing */}
+            {/* Desktop Navigation - CENTERED with good spacing */}
             <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
-              <div className="flex items-center space-x-2 xl:space-x-6">
+              <div className="flex items-center space-x-4 xl:space-x-8">
                 {navLinks.filter(link => link.is_visible).map((link) => (
                   <Link
                     key={link.id}
                     href={link.href}
-                    className={`px-3 xl:px-4 py-2 text-base font-medium whitespace-nowrap rounded-md transition-colors ${
+                    className={`px-3 py-2 text-base lg:text-lg font-medium whitespace-nowrap rounded-md transition-colors ${
                       isActive(link.href)
                         ? 'text-blue-600 font-semibold bg-blue-50'
                         : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -114,54 +114,6 @@ export default function Header() {
                 ))}
               </div>
             </nav>
-
-            {/* Desktop Auth - Right side */}
-            <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
-              {!loading && (
-                <>
-                  {user ? (
-                    <div className="flex items-center space-x-2">
-                      {isAdmin && (
-                        <Link href="/admin">
-                          <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-purple-600">
-                            <Shield className="w-4 h-4 mr-1" />
-                            Admin
-                          </Button>
-                        </Link>
-                      )}
-                      <Link href="/dashboard">
-                        <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-blue-600">
-                          <User className="w-4 h-4 mr-1" />
-                          Dashboard
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleSignOut}
-                        className="text-sm text-gray-600 hover:text-red-600"
-                      >
-                        <LogOut className="w-4 h-4 mr-1" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-3">
-                      <Link href="/login">
-                        <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-blue-600">
-                          Sign In
-                        </Button>
-                      </Link>
-                      <Link href="/signup">
-                        <Button className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-5 py-2">
-                          Get Started Free
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
 
             {/* Mobile Menu Button */}
             <MobileButton
@@ -175,6 +127,61 @@ export default function Header() {
                 <Menu className="w-6 h-6 text-gray-700" />
               )}
             </MobileButton>
+          </div>
+        </div>
+      </div>
+
+      {/* ROW 2: Auth/Account Row - SEPARATE LINE below navigation */}
+      <div className="bg-gray-50 border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="hidden lg:flex items-center justify-end h-12">
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="flex items-center space-x-3">
+                    {isAdmin && (
+                      <Link href="/admin">
+                        <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-purple-600">
+                          <Shield className="w-4 h-4 mr-1.5" />
+                          Admin
+                        </Button>
+                      </Link>
+                    )}
+                    <Link href="/dashboard">
+                      <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-blue-600">
+                        <User className="w-4 h-4 mr-1.5" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <span className="text-sm text-gray-500 px-2">
+                      {user.email}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleSignOut}
+                      className="text-sm text-gray-600 hover:text-red-600"
+                    >
+                      <LogOut className="w-4 h-4 mr-1.5" />
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-3">
+                    <Link href="/login">
+                      <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-blue-600">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-5 py-2">
+                        Get Started Free
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -228,6 +235,9 @@ export default function Header() {
                           <User className="w-5 h-5 mr-2 text-blue-600" />
                           Dashboard
                         </Link>
+                        <div className="px-4 py-2 text-sm text-gray-500">
+                          {user.email}
+                        </div>
                         <button
                           onClick={() => {
                             handleSignOut();
