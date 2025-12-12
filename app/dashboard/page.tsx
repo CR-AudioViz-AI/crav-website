@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // app/dashboard/page.tsx
 // Complete Customer Dashboard - All Features
 // Timestamp: Dec 11, 2025 9:59 PM EST
