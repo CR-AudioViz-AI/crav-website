@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // app/api/referrals/code/route.ts
 // Get or create referral code
 // Timestamp: Dec 11, 2025 11:55 PM EST
