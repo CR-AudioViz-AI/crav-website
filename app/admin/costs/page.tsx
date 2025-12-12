@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // app/admin/costs/page.tsx
 // Admin Cost Tracking - Supabase, Vercel, APIs
 // Timestamp: Dec 11, 2025 10:33 PM EST
