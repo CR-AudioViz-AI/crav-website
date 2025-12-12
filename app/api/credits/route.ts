@@ -1,7 +1,6 @@
-// ================================================================================
-// CR AUDIOVIZ AI - CREDIT SYSTEM API
-// Complete credit management with Stripe/PayPal integration
-// ================================================================================
+// app/api/credits/route.ts
+// Centralized Credit System API - Universal credit management
+// Timestamp: Dec 11, 2025 10:37 PM EST
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -11,157 +10,225 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export const runtime = 'edge';
-
-// ============================================================================
-// GET /api/credits/balance - Get user's credit balance
-// ============================================================================
+// GET - Check credit balance
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ error: 'userId required' }, { status: 400 });
     }
 
-    // Get user from auth token
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
-    // Get credit balance
     const { data: credits, error } = await supabase
-      .from('credits')
-      .select('*')
-      .eq('user_id', user.id)
+      .from('user_credits')
+      .select('balance, lifetime_earned, lifetime_spent')
+      .eq('user_id', userId)
       .single();
 
     if (error) {
-      // If no credits record exists, create one with free tier
-      const { data: newCredits, error: createError } = await supabase
-        .from('credits')
-        .insert([{
-          user_id: user.id,
-          balance: 100, // Free tier starts with 100 credits
-          lifetime_earned: 100,
-          monthly_allowance: 100
-        }])
-        .select()
-        .single();
-
-      if (createError) {
-        console.error('Error creating credits:', createError);
-        return NextResponse.json({ error: 'Failed to initialize credits' }, { status: 500 });
+      // Create credit record if doesn't exist
+      if (error.code === 'PGRST116') {
+        const { data: newCredits } = await supabase
+          .from('user_credits')
+          .insert({ user_id: userId, balance: 0, lifetime_earned: 0, lifetime_spent: 0 })
+          .select()
+          .single();
+        return NextResponse.json({ success: true, credits: newCredits });
       }
-
-      return NextResponse.json({ credits: newCredits });
+      throw error;
     }
 
-    return NextResponse.json({ credits });
+    return NextResponse.json({ success: true, credits });
 
-  } catch (error: any) {
-    console.error('Credits balance error:', error);
+  } catch (error) {
+    console.error('Credit check error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: error instanceof Error ? error.message : 'Failed to check credits' },
       { status: 500 }
     );
   }
 }
 
-// ============================================================================
-// POST /api/credits/deduct - Deduct credits for service usage
-// ============================================================================
+// POST - Credit operations (check, deduct, add, refund)
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { amount, service_type, service_id, service_name, description } = body;
+    const { action, userId, amount, appId, operationId, reason } = body;
 
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    if (!userId || !action) {
+      return NextResponse.json({ error: 'userId and action required' }, { status: 400 });
     }
 
-    // Get current balance
-    const { data: credits, error: fetchError } = await supabase
-      .from('credits')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
+    // ============================================
+    // CHECK - Verify user has enough credits
+    // ============================================
+    if (action === 'check') {
+      const { data: credits } = await supabase
+        .from('user_credits')
+        .select('balance')
+        .eq('user_id', userId)
+        .single();
 
-    if (fetchError || !credits) {
-      return NextResponse.json({ error: 'Credits not found' }, { status: 404 });
-    }
-
-    // Check sufficient balance
-    if (credits.balance < amount) {
+      const hasEnough = (credits?.balance || 0) >= (amount || 0);
+      
       return NextResponse.json({
-        error: 'Insufficient credits',
-        balance: credits.balance,
-        required: amount
-      }, { status: 402 });
+        success: true,
+        hasEnough,
+        balance: credits?.balance || 0,
+        required: amount || 0,
+      });
     }
 
-    // Deduct credits
-    const newBalance = credits.balance - amount;
-    const newLifetimeSpent = credits.lifetime_spent + amount;
+    // ============================================
+    // DEDUCT - Use credits for an operation
+    // ============================================
+    if (action === 'deduct') {
+      if (!amount || amount <= 0) {
+        return NextResponse.json({ error: 'Valid amount required' }, { status: 400 });
+      }
 
-    const { error: updateError } = await supabase
-      .from('credits')
-      .update({
-        balance: newBalance,
-        lifetime_spent: newLifetimeSpent,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', user.id);
+      // Get current balance
+      const { data: credits, error: balanceError } = await supabase
+        .from('user_credits')
+        .select('balance')
+        .eq('user_id', userId)
+        .single();
 
-    if (updateError) {
-      console.error('Error updating credits:', updateError);
-      return NextResponse.json({ error: 'Failed to deduct credits' }, { status: 500 });
-    }
+      if (balanceError || !credits) {
+        return NextResponse.json({ error: 'User credits not found' }, { status: 404 });
+      }
 
-    // Record transaction
-    const { error: txError } = await supabase
-      .from('transactions')
-      .insert([{
-        user_id: user.id,
+      if (credits.balance < amount) {
+        return NextResponse.json({
+          success: false,
+          error: 'Insufficient credits',
+          balance: credits.balance,
+          required: amount,
+        }, { status: 402 });
+      }
+
+      // Deduct credits atomically
+      const { data: updated, error: deductError } = await supabase.rpc('deduct_credits', {
+        p_user_id: userId,
+        p_amount: amount,
+      });
+
+      if (deductError) {
+        throw deductError;
+      }
+
+      // Log transaction
+      await supabase.from('credit_transactions').insert({
+        user_id: userId,
         type: 'deduction',
-        amount: -amount,
-        balance_after: newBalance,
-        service_type,
-        service_id,
-        service_name,
-        description,
-        status: 'completed',
-        payment_method: 'system'
-      }]);
+        credits: -amount,
+        app_id: appId,
+        operation_id: operationId,
+        reason: reason || `Used ${amount} credits`,
+      });
 
-    if (txError) {
-      console.error('Error recording transaction:', txError);
+      return NextResponse.json({
+        success: true,
+        previousBalance: credits.balance,
+        newBalance: credits.balance - amount,
+        deducted: amount,
+      });
     }
 
-    return NextResponse.json({
-      success: true,
-      balance: newBalance,
-      deducted: amount
-    });
+    // ============================================
+    // ADD - Add credits to user account
+    // ============================================
+    if (action === 'add') {
+      if (!amount || amount <= 0) {
+        return NextResponse.json({ error: 'Valid amount required' }, { status: 400 });
+      }
 
-  } catch (error: any) {
-    console.error('Credit deduction error:', error);
+      const { data: updated, error } = await supabase.rpc('add_user_credits', {
+        p_user_id: userId,
+        p_credits: amount,
+        p_source: reason || 'manual_add',
+        p_reference_id: operationId,
+      });
+
+      if (error) throw error;
+
+      // Get new balance
+      const { data: credits } = await supabase
+        .from('user_credits')
+        .select('balance')
+        .eq('user_id', userId)
+        .single();
+
+      return NextResponse.json({
+        success: true,
+        newBalance: credits?.balance || 0,
+        added: amount,
+      });
+    }
+
+    // ============================================
+    // REFUND - Return credits for failed operation
+    // ============================================
+    if (action === 'refund') {
+      if (!amount || amount <= 0 || !operationId) {
+        return NextResponse.json({ error: 'amount and operationId required' }, { status: 400 });
+      }
+
+      // Check if already refunded
+      const { data: existing } = await supabase
+        .from('credit_transactions')
+        .select('id')
+        .eq('operation_id', operationId)
+        .eq('type', 'refund')
+        .single();
+
+      if (existing) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Already refunded',
+          message: 'This operation was already refunded' 
+        }, { status: 409 });
+      }
+
+      // Add credits back
+      await supabase.rpc('add_user_credits', {
+        p_user_id: userId,
+        p_credits: amount,
+        p_source: 'refund',
+        p_reference_id: operationId,
+      });
+
+      // Log refund
+      await supabase.from('credit_transactions').insert({
+        user_id: userId,
+        type: 'refund',
+        credits: amount,
+        app_id: appId,
+        operation_id: operationId,
+        reason: reason || `Refund for operation ${operationId}`,
+      });
+
+      const { data: credits } = await supabase
+        .from('user_credits')
+        .select('balance')
+        .eq('user_id', userId)
+        .single();
+
+      return NextResponse.json({
+        success: true,
+        refunded: amount,
+        newBalance: credits?.balance || 0,
+        message: 'Credits refunded successfully',
+      });
+    }
+
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+
+  } catch (error) {
+    console.error('Credit operation error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: error instanceof Error ? error.message : 'Credit operation failed' },
       { status: 500 }
     );
   }
