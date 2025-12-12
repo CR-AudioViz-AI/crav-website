@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // app/admin/credits/page.tsx
 // Admin Credit System Management
 // Timestamp: Dec 11, 2025 10:25 PM EST
