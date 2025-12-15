@@ -38,6 +38,14 @@
     {
       "path": "/api/cron/mortgage-rates",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/discover-grants",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/learn-grants",
+      "schedule": "0 2 * * 0"
     }
   ],
   "git": {
