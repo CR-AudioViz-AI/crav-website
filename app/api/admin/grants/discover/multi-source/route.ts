@@ -3,6 +3,9 @@
 // Grants.gov, USASpending, Sam.gov, Data.gov, State Grants, Foundation 990s
 // Timestamp: Saturday, December 13, 2025 - 12:55 PM EST
 
+// Force dynamic rendering - uses cookies
+export const dynamic = 'force-dynamic';
+
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
