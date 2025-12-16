@@ -186,11 +186,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* CR = Coordinated Rejuvenating Banner */}
-      <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white text-center py-1.5 text-sm font-medium">
-        CR = Coordinated Rejuvenating
-      </div>
-
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200">
