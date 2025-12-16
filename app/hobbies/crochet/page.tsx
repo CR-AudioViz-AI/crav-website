@@ -18,6 +18,7 @@ import { redirect } from 'next/navigation';
 import CrochetGenerator from '@/components/crochet/CrochetGenerator';
 import CrochetHeader from '@/components/crochet/CrochetHeader';
 import CrossSellBanner from '@/components/crochet/CrossSellBanner';
+import { PATTERN_CREDITS } from '@/lib/crochet/constants';
 
 export const metadata: Metadata = {
   title: 'CrochetAI - AI Pattern Generator | CR AudioViz AI',
@@ -29,15 +30,6 @@ export const metadata: Metadata = {
     images: ['/images/crochet-og.png'],
   },
 };
-
-// Credit costs per pattern type
-export const PATTERN_CREDITS = {
-  simple: 2,      // ball, coaster
-  basic: 4,       // whale, basic shapes
-  standard: 5,    // manatee, octopus
-  complex: 7,     // teddy bear, cat, dog
-  custom: 10,     // custom requests
-} as const;
 
 export default async function CrochetPage() {
   const supabase = createClient();
@@ -256,3 +248,4 @@ export default async function CrochetPage() {
     </div>
   );
 }
+
