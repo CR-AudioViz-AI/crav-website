@@ -5,16 +5,17 @@
  * CR AudioViz AI - craudiovizai.com/marketing/launch-checklist
  * Optimized checklists for Product Hunt, HN, Reddit, etc.
  * Created: December 16, 2025
+ * Fixed: Added Suspense boundary for useSearchParams
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import {
   Rocket, ChevronLeft, Check, Clock, AlertCircle, 
   ExternalLink, ChevronDown, ChevronUp, Calendar,
-  Users, Target, Sparkles, Share2, Star
+  Users, Target, Sparkles, Share2, Star, Loader2
 } from 'lucide-react';
 
 // Platform Checklists
@@ -209,7 +210,8 @@ const PLATFORM_CHECKLISTS = {
 
 type PlatformKey = keyof typeof PLATFORM_CHECKLISTS;
 
-export default function LaunchChecklist() {
+// Inner component that uses useSearchParams
+function LaunchChecklistContent() {
   const searchParams = useSearchParams();
   const initialPlatform = (searchParams.get('platform') as PlatformKey) || 'product-hunt';
   
@@ -506,5 +508,26 @@ export default function LaunchChecklist() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-10 h-10 animate-spin text-purple-600 mx-auto mb-4" />
+        <p className="text-gray-600">Loading checklist...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main export with Suspense boundary
+export default function LaunchChecklist() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <LaunchChecklistContent />
+    </Suspense>
   );
 }
