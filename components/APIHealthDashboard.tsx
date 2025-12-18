@@ -1,14 +1,13 @@
 // ============================================================
 // CR AUDIOVIZ AI - API HEALTH DASHBOARD
-// /components/admin/APIHealthDashboard.tsx
+// /components/APIHealthDashboard.tsx
 // Real-time monitoring dashboard for all 30+ APIs
-// Created: December 17, 2025
+// Created: December 17, 2025 (Fixed - no framer-motion)
 // ============================================================
 
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
   CheckCircle2,
@@ -91,7 +90,11 @@ const categoryIcons: Record<string, React.ReactNode> = {
   'Weather': <Cloud className="w-4 h-4" />,
   'Video': <Video className="w-4 h-4" />,
   'Lead Gen': <Mail className="w-4 h-4" />,
-  'Database': <Database className="w-4 h-4" />
+  'Database': <Database className="w-4 h-4" />,
+  'ai': <Brain className="w-4 h-4" />,
+  'market_data': <DollarSign className="w-4 h-4" />,
+  'analytics': <BarChart3 className="w-4 h-4" />,
+  'email': <Mail className="w-4 h-4" />
 };
 
 // ============================================================
@@ -139,12 +142,8 @@ function APICard({ api, expanded, onToggle }: {
       : 'text-red-400';
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className={`rounded-xl border ${statusColors[api.status]} backdrop-blur-sm overflow-hidden`}
+    <div
+      className={`rounded-xl border ${statusColors[api.status]} backdrop-blur-sm overflow-hidden transition-all duration-300`}
     >
       <button
         onClick={onToggle}
@@ -156,7 +155,7 @@ function APICard({ api, expanded, onToggle }: {
           </div>
           <div className="text-left">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-white">{api.displayName}</span>
+              <span className="font-medium text-white">{api.displayName || api.name}</span>
               {api.isCritical && (
                 <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400 rounded">
                   Critical
@@ -187,65 +186,57 @@ function APICard({ api, expanded, onToggle }: {
         </div>
       </button>
 
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-slate-700/50"
-          >
-            <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      {expanded && (
+        <div className="border-t border-slate-700/50 transition-all duration-300">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <span className="text-slate-400 block text-xs mb-1">Status Code</span>
+              <span className="text-white font-mono">{api.statusCode || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-xs mb-1">Latency</span>
+              <span className={`font-mono ${latencyColor}`}>{api.latencyMs}ms</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-xs mb-1">Message</span>
+              <span className="text-white">{api.message}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-xs mb-1">Last Checked</span>
+              <span className="text-white">
+                {new Date(api.lastChecked).toLocaleTimeString()}
+              </span>
+            </div>
+            
+            {api.quotaRemaining !== undefined && (
               <div>
-                <span className="text-slate-400 block text-xs mb-1">Status Code</span>
-                <span className="text-white font-mono">{api.statusCode || 'N/A'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-xs mb-1">Latency</span>
-                <span className={`font-mono ${latencyColor}`}>{api.latencyMs}ms</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-xs mb-1">Message</span>
-                <span className="text-white">{api.message}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-xs mb-1">Last Checked</span>
-                <span className="text-white">
-                  {new Date(api.lastChecked).toLocaleTimeString()}
+                <span className="text-slate-400 block text-xs mb-1">Quota Remaining</span>
+                <span className="text-white font-mono">
+                  {api.quotaRemaining.toLocaleString()}
+                  {api.quotaLimit && ` / ${api.quotaLimit.toLocaleString()}`}
                 </span>
               </div>
-              
-              {api.quotaRemaining !== undefined && (
-                <div>
-                  <span className="text-slate-400 block text-xs mb-1">Quota Remaining</span>
-                  <span className="text-white font-mono">
-                    {api.quotaRemaining.toLocaleString()}
-                    {api.quotaLimit && ` / ${api.quotaLimit.toLocaleString()}`}
-                  </span>
-                </div>
-              )}
-              
-              {api.failoverGroup && (
-                <div>
-                  <span className="text-slate-400 block text-xs mb-1">Failover Group</span>
-                  <span className="text-cyan-400 font-mono text-xs">{api.failoverGroup}</span>
-                </div>
-              )}
-              
-              {api.freeAnnualValue > 0 && (
-                <div>
-                  <span className="text-slate-400 block text-xs mb-1">Annual Value</span>
-                  <span className="text-emerald-400 font-medium">
-                    ${api.freeAnnualValue.toLocaleString()}/year
-                  </span>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+            )}
+            
+            {api.failoverGroup && (
+              <div>
+                <span className="text-slate-400 block text-xs mb-1">Failover Group</span>
+                <span className="text-cyan-400 font-mono text-xs">{api.failoverGroup}</span>
+              </div>
+            )}
+            
+            {api.freeAnnualValue > 0 && (
+              <div>
+                <span className="text-slate-400 block text-xs mb-1">Annual Value</span>
+                <span className="text-emerald-400 font-medium">
+                  ${api.freeAnnualValue.toLocaleString()}/year
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -267,11 +258,7 @@ function SummaryCard({
   subtext?: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className={`rounded-xl border ${color} p-4 backdrop-blur-sm`}
-    >
+    <div className={`rounded-xl border ${color} p-4 backdrop-blur-sm transition-all duration-300`}>
       <div className="flex items-start justify-between">
         <div>
           <span className="text-slate-400 text-xs uppercase tracking-wider">{label}</span>
@@ -282,7 +269,7 @@ function SummaryCard({
           <Icon className="w-5 h-5 text-slate-300" />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -387,7 +374,6 @@ export default function APIHealthDashboard() {
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Background Pattern */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black -z-10" />
-      <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFmMjkzNyIgc3Ryb2tlLW9wYWNpdHk9IjAuMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20 -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -427,22 +413,14 @@ export default function APIHealthDashboard() {
 
         {/* Error Banner */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400"
-          >
+          <div className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400">
             <strong>Error:</strong> {error}
-          </motion.div>
+          </div>
         )}
 
         {/* Overall Status Banner */}
         {data && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`mb-6 p-6 rounded-xl border ${statusConfig.border} ${statusConfig.bg}`}
-          >
+          <div className={`mb-6 p-6 rounded-xl border ${statusConfig.border} ${statusConfig.bg}`}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <span className={`text-2xl font-bold ${statusConfig.text}`}>
@@ -465,7 +443,7 @@ export default function APIHealthDashboard() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Summary Cards */}
