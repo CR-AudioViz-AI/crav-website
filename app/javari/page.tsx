@@ -1,121 +1,140 @@
-import { MobileButton } from '@/components/mobile';
-import { Card, CardContent } from '@/components/ui/card';
-import { Bot, Code, Zap, Brain, Sparkles, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Metadata } from "next"
+import { JavariChat } from "@/components/javari/JavariChat"
+import { Card, CardContent } from "@/components/ui/card"
+import { Bot, Code, Zap, Brain, Sparkles, MessageSquare, Wrench, Shield } from "lucide-react"
+import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Javari AI - Your Intelligent Assistant | CR AudioViz AI",
+  description: "Chat with Javari, your AI-powered assistant for coding, analysis, creative work, and more."
+}
 
 export default function JavariPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white px-4 py-12 md:py-16 lg:py-20">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <Bot className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 md:mb-6" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
+      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white px-4 py-12 md:py-16">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-8">
+            <Bot className="w-16 h-16 mx-auto mb-4" />
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Meet Javari AI
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
-              Your autonomous AI development assistant that builds production-ready apps
+            <p className="text-lg md:text-xl text-purple-100 max-w-2xl mx-auto">
+              Your autonomous AI assistant that helps with coding, analysis, creative writing, and building production-ready solutions.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <a href="https://javari-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="flex-1">
-                <MobileButton size="lg" fullWidth className="bg-white text-purple-600 hover:bg-purple-50">
-                  Chat with Javari
-                </MobileButton>
-              </a>
-              <Link href="/pricing" className="flex-1">
-                <MobileButton size="lg" fullWidth variant="outline" className="border-2 border-white text-white hover:bg-white/10">
-                  View Plans
-                </MobileButton>
-              </Link>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="px-4 py-12 md:py-16 bg-white">
-        <div className="container mx-auto">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8 text-center">What Javari Can Do</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <Code className="w-10 h-10 md:w-12 md:h-12 text-blue-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Build Apps</h3>
-                  <p className="text-xs md:text-sm text-gray-600">Full-stack apps in minutes</p>
-                </CardContent>
-              </Card>
+      {/* Main Chat Section */}
+      <section className="px-4 py-8 md:py-12 -mt-8">
+        <div className="container mx-auto max-w-4xl">
+          <JavariChat className="shadow-2xl" showCredits={true} userCredits={100} />
+        </div>
+      </section>
 
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <Zap className="w-10 h-10 md:w-12 md:h-12 text-yellow-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Deploy Instantly</h3>
-                  <p className="text-xs md:text-sm text-gray-600">Push to GitHub & Vercel</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <Brain className="w-10 h-10 md:w-12 md:h-12 text-purple-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Self-Improving</h3>
-                  <p className="text-xs md:text-sm text-gray-600">Learns from every project</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-pink-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Fortune 50 Quality</h3>
-                  <p className="text-xs md:text-sm text-gray-600">Production-ready code</p>
-                </CardContent>
-              </Card>
-            </div>
+      {/* Capabilities Grid */}
+      <section className="px-4 py-12 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            What Javari Can Do
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CapabilityCard
+              icon={<Code className="w-8 h-8" />}
+              title="Code Assistant"
+              description="Write, debug, and optimize code in any language"
+            />
+            <CapabilityCard
+              icon={<Brain className="w-8 h-8" />}
+              title="Analysis"
+              description="Data analysis, research synthesis, and insights"
+            />
+            <CapabilityCard
+              icon={<Sparkles className="w-8 h-8" />}
+              title="Creative Writing"
+              description="Content creation, copywriting, and storytelling"
+            />
+            <CapabilityCard
+              icon={<Wrench className="w-8 h-8" />}
+              title="Problem Solving"
+              description="Strategy, planning, and technical solutions"
+            />
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="px-4 py-12 md:py-16 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">10x</div>
-                <div className="text-xs md:text-sm text-gray-600">Faster Development</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">24/7</div>
-                <div className="text-xs md:text-sm text-gray-600">Always Available</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">1000+</div>
-                <div className="text-xs md:text-sm text-gray-600">Apps Built</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">95%</div>
-                <div className="text-xs md:text-sm text-gray-600">Success Rate</div>
-              </div>
-            </div>
+      {/* Features Section */}
+      <section className="px-4 py-12">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<Zap className="w-6 h-6 text-yellow-500" />}
+              title="Credits System"
+              description="Pay only for what you use. Credits never expire on paid plans."
+            />
+            <FeatureCard
+              icon={<MessageSquare className="w-6 h-6 text-blue-500" />}
+              title="Conversation Memory"
+              description="Javari remembers context throughout your session."
+            />
+            <FeatureCard
+              icon={<Shield className="w-6 h-6 text-green-500" />}
+              title="Secure & Private"
+              description="Your conversations are encrypted and never shared."
+            />
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Build?</h2>
-          <p className="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-2xl mx-auto">
-            Start chatting with Javari and bring your ideas to life
+      {/* CTA Section */}
+      <section className="px-4 py-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Ready to Build Something Amazing?
+          </h2>
+          <p className="text-lg text-purple-100 mb-6">
+            Get started with 100 free credits when you sign up.
           </p>
-          <a href="https://javari-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-block">
-            <MobileButton size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-              Launch Javari AI <ArrowRight className="w-4 h-4 ml-2" />
-            </MobileButton>
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="px-8 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition">
+              Sign Up Free
+            </Link>
+            <Link href="/pricing" className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">
+              View Pricing
+            </Link>
+          </div>
         </div>
       </section>
     </div>
-  );
+  )
+}
+
+function CapabilityCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <Card className="text-center p-6 hover:shadow-lg transition">
+      <CardContent className="pt-4">
+        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center text-purple-600">
+          {icon}
+        </div>
+        <h3 className="font-semibold text-lg mb-2">{title}</h3>
+        <p className="text-gray-600 text-sm">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="flex gap-4">
+      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-semibold mb-1">{title}</h3>
+        <p className="text-gray-600 text-sm">{description}</p>
+      </div>
+    </div>
+  )
 }
