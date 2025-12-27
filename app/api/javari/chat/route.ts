@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,27 +60,52 @@ export async function POST(req: NextRequest) {
 
     messages.push({ role: "user", content: message });
 
-    // Call Anthropic
     let response = "";
     let provider = "anthropic";
 
-    try {
-      const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-      const completion = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307",
-        max_tokens: 500,
-        system: SYSTEM_PROMPT,
-        messages: messages.map(m => ({ 
-          role: m.role as "user" | "assistant", 
-          content: m.content 
-        }))
-      });
-      response = completion.content[0].type === "text" ? completion.content[0].text : "";
-    } catch (e: any) {
-      console.error("Anthropic error:", e.message);
+    // Try Anthropic first
+    if (process.env.ANTHROPIC_API_KEY) {
+      try {
+        const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+        const completion = await anthropic.messages.create({
+          model: "claude-3-haiku-20240307",
+          max_tokens: 500,
+          system: SYSTEM_PROMPT,
+          messages: messages.map(m => ({ 
+            role: m.role as "user" | "assistant", 
+            content: m.content 
+          }))
+        });
+        response = completion.content[0].type === "text" ? completion.content[0].text : "";
+      } catch (anthropicError: any) {
+        console.error("Anthropic error:", anthropicError.message);
+        provider = "openai";
+      }
+    }
+
+    // Fallback to OpenAI
+    if (!response && process.env.OPENAI_API_KEY) {
+      try {
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          max_tokens: 500,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...messages.map(m => ({ role: m.role as "user" | "assistant", content: m.content }))
+          ]
+        });
+        response = completion.choices[0].message.content || "";
+        provider = "openai";
+      } catch (openaiError: any) {
+        console.error("OpenAI error:", openaiError.message);
+      }
+    }
+
+    if (!response) {
       return NextResponse.json({ 
         error: "AI service temporarily unavailable",
-        fallback_response: "I apologize, I am having trouble responding. Please try again."
+        fallback_response: "I apologize, I am having trouble responding. Please try again or create a support ticket."
       }, { status: 503 });
     }
 
@@ -99,7 +125,10 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error("Javari chat error:", error);
-    return NextResponse.json({ error: "Failed to process message" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Failed to process message",
+      fallback_response: "I apologize, something went wrong. Please try again."
+    }, { status: 500 });
   }
 }
 
