@@ -8,7 +8,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Enhanced system prompt with RAG context
 const buildSystemPrompt = (context: string) => `You are Javari, the AI assistant for CR AudioViz AI (CRAIverse). 
 
 KNOWLEDGE BASE CONTEXT:
@@ -19,7 +18,6 @@ CAPABILITIES:
 2. Technical Support - Troubleshoot issues, guide through features  
 3. Account Help - Billing, subscriptions, credits
 4. App Guidance - Help users find the right tools
-5. Code Assistance - Help with development tasks
 
 KEY INFO:
 - CRAIverse offers 60+ AI-powered creative tools
@@ -30,15 +28,8 @@ GUIDELINES:
 - Be helpful, friendly, concise
 - Never make up information
 - Suggest relevant apps when appropriate
-- Create support tickets for complex issues
-- Keep responses under 200 words unless detail needed
+- Keep responses under 200 words unless detail needed`;
 
-SELF-IMPROVEMENT:
-- Log unclear questions for training data
-- Track successful interactions for patterns
-- Identify gaps in knowledge base`;
-
-// POST /api/javari/enhanced - Enhanced chat with RAG
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -56,10 +47,8 @@ export async function POST(req: NextRequest) {
       .eq("status", "published")
       .limit(3);
 
-    // Build RAG context
-    const ragContext = kbResults?.map(r => `[${r.title}]: ${r.content}`).join("
-
-") || "";
+    // Build RAG context - fixed join
+    const ragContext = kbResults?.map(r => "[" + r.title + "]: " + r.content).join("\n\n") || "";
 
     // Get or create conversation
     let convId = conversation_id;
@@ -91,7 +80,6 @@ export async function POST(req: NextRequest) {
 
     messages.push({ role: "user", content: message });
 
-    // Try Anthropic first with enhanced context
     let response = "";
     let provider = "anthropic";
     let tokensUsed = 0;
@@ -128,25 +116,15 @@ export async function POST(req: NextRequest) {
       tokensUsed = completion.usage?.total_tokens || 0;
     }
 
-    // Save messages with metadata
+    // Save messages
     if (convId) {
       await supabase.from("craiverse_javari_messages").insert([
-        { 
-          conversation_id: convId, 
-          role: "user", 
-          content: message 
-        },
-        { 
-          conversation_id: convId, 
-          role: "assistant", 
-          content: response, 
-          provider,
-          tokens_used: tokensUsed
-        }
+        { conversation_id: convId, role: "user", content: message },
+        { conversation_id: convId, role: "assistant", content: response, provider, tokens_used: tokensUsed }
       ]);
     }
 
-    // Log for training/improvement
+    // Log for training
     await supabase.from("craiverse_javari_training_data").insert({
       conversation_id: convId,
       user_message: message,
@@ -157,11 +135,9 @@ export async function POST(req: NextRequest) {
       tokens_used: tokensUsed
     });
 
-    // Detect if should escalate
     const shouldEscalate = 
       message.toLowerCase().includes("speak to human") ||
       message.toLowerCase().includes("talk to someone") ||
-      message.toLowerCase().includes("not helpful") ||
       response.toLowerCase().includes("support ticket");
 
     return NextResponse.json({
