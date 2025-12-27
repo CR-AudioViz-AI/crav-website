@@ -1,352 +1,303 @@
-// CR AudioViz AI - PayPal Webhook Handler (Enhanced)
-// Version: 2.0
-// Created: November 5, 2025
-// Purpose: Production-ready PayPal webhook with signature verification
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { PayPalClient } from '@/lib/payments/paypal-client'
-import { PaymentService } from '@/lib/payments/payment-service'
-import { getErrorMessage, logError, formatApiError } from '@/lib/utils/error-utils';
-
-// Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-)
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-// ============================================================================
-// WEBHOOK HANDLER
-// ============================================================================
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!;
+const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID!;
+const PAYPAL_API_URL = process.env.PAYPAL_MODE === 'live' 
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com';
+
+// Credit packages mapping (PayPal plan ID -> credits)
+const CREDIT_PACKAGES: Record<string, { credits: number; bonus: number; name: string }> = {
+  'CREDIT_STARTER': { credits: 100, bonus: 0, name: 'Starter' },
+  'CREDIT_POPULAR': { credits: 500, bonus: 50, name: 'Popular' },
+  'CREDIT_PRO': { credits: 1000, bonus: 150, name: 'Pro' },
+  'CREDIT_ENTERPRISE': { credits: 5000, bonus: 1000, name: 'Enterprise' },
+};
+
+const SUBSCRIPTION_PLANS: Record<string, { plan: string; credits_per_month: number }> = {
+  'PLAN_STARTER': { plan: 'starter', credits_per_month: 200 },
+  'PLAN_PRO': { plan: 'pro', credits_per_month: 1000 },
+  'PLAN_ENTERPRISE': { plan: 'enterprise', credits_per_month: 5000 },
+};
+
+async function getPayPalAccessToken(): Promise<string> {
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
+  
+  const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+async function verifyWebhookSignature(
+  body: string,
+  headers: Record<string, string>
+): Promise<boolean> {
+  try {
+    const accessToken = await getPayPalAccessToken();
+    
+    const response = await fetch(`${PAYPAL_API_URL}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        auth_algo: headers['paypal-auth-algo'],
+        cert_url: headers['paypal-cert-url'],
+        transmission_id: headers['paypal-transmission-id'],
+        transmission_sig: headers['paypal-transmission-sig'],
+        transmission_time: headers['paypal-transmission-time'],
+        webhook_id: PAYPAL_WEBHOOK_ID,
+        webhook_event: JSON.parse(body),
+      }),
+    });
+
+    const result = await response.json();
+    return result.verification_status === 'SUCCESS';
+  } catch (error) {
+    console.error('PayPal webhook verification failed:', error);
+    return false;
+  }
+}
+
+async function addCreditsToUser(userId: string, credits: number, bonus: number, source: string, reference: string) {
+  const { data: current } = await supabase
+    .from('craiverse_credits')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  const newBalance = (current?.balance || 0) + credits;
+  const newBonus = (current?.bonus_balance || 0) + bonus;
+  const lifetimeEarned = (current?.lifetime_earned || 0) + credits + bonus;
+
+  await supabase.from('craiverse_credits').upsert({
+    user_id: userId,
+    balance: newBalance,
+    bonus_balance: newBonus,
+    lifetime_earned: lifetimeEarned,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id' });
+
+  await supabase.from('craiverse_credit_transactions').insert({
+    user_id: userId,
+    amount: credits + bonus,
+    balance_after: newBalance + newBonus,
+    type: 'purchase',
+    source_app: 'craiverse',
+    source_action: source,
+    source_reference_id: reference,
+    description: `Purchased ${credits} credits` + (bonus > 0 ? ` + ${bonus} bonus` : ''),
+  });
+
+  await supabase.from('craiverse_notifications').insert({
+    user_id: userId,
+    type: 'credits_added',
+    title: 'Credits Added! 🎉',
+    message: `${credits + bonus} credits have been added to your account.`,
+    source_app: 'craiverse',
+    source_type: 'payment',
+    source_id: reference,
+  });
+
+  return { newBalance, newBonus };
+}
+
+async function handlePaymentCompleted(event: any) {
+  const orderId = event.resource.id;
+  const customId = event.resource.purchase_units?.[0]?.custom_id;
+  
+  if (!customId) {
+    console.error('No custom_id in PayPal order');
+    return;
+  }
+
+  // custom_id format: "user_id:package_id"
+  const [userId, packageId] = customId.split(':');
+  const packageInfo = CREDIT_PACKAGES[packageId];
+
+  if (!packageInfo) {
+    console.error('Unknown package:', packageId);
+    return;
+  }
+
+  await addCreditsToUser(userId, packageInfo.credits, packageInfo.bonus, 'paypal_checkout', orderId);
+}
+
+async function handleSubscriptionActivated(event: any) {
+  const subscriptionId = event.resource.id;
+  const customId = event.resource.custom_id;
+  const planId = event.resource.plan_id;
+
+  if (!customId) return;
+
+  const userId = customId;
+  const planInfo = SUBSCRIPTION_PLANS[planId];
+
+  if (!planInfo) return;
+
+  const startTime = new Date(event.resource.start_time);
+  const nextBillingTime = new Date(event.resource.billing_info?.next_billing_time || startTime);
+
+  await supabase.from('craiverse_subscriptions').upsert({
+    user_id: userId,
+    plan: planInfo.plan,
+    status: 'active',
+    billing_cycle: 'monthly',
+    paypal_subscription_id: subscriptionId,
+    current_period_start: startTime.toISOString(),
+    current_period_end: nextBillingTime.toISOString(),
+    credits_per_month: planInfo.credits_per_month,
+    credits_used_this_month: 0,
+    credits_reset_at: nextBillingTime.toISOString(),
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id' });
+
+  await addCreditsToUser(userId, planInfo.credits_per_month, 0, 'subscription_activation', subscriptionId);
+}
+
+async function handleSubscriptionCancelled(event: any) {
+  const subscriptionId = event.resource.id;
+
+  await supabase.from('craiverse_subscriptions').update({
+    status: 'canceled',
+    canceled_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('paypal_subscription_id', subscriptionId);
+
+  const { data: sub } = await supabase
+    .from('craiverse_subscriptions')
+    .select('user_id')
+    .eq('paypal_subscription_id', subscriptionId)
+    .single();
+
+  if (sub) {
+    await supabase.from('craiverse_notifications').insert({
+      user_id: sub.user_id,
+      type: 'subscription_canceled',
+      title: 'Subscription Canceled',
+      message: 'Your PayPal subscription has been canceled.',
+      source_app: 'craiverse',
+    });
+  }
+}
+
+async function handlePaymentSaleCompleted(event: any) {
+  // Recurring payment received
+  const subscriptionId = event.resource.billing_agreement_id;
+  
+  if (!subscriptionId) return;
+
+  const { data: sub } = await supabase
+    .from('craiverse_subscriptions')
+    .select('user_id, credits_per_month')
+    .eq('paypal_subscription_id', subscriptionId)
+    .single();
+
+  if (!sub) return;
+
+  await addCreditsToUser(sub.user_id, sub.credits_per_month, 0, 'subscription_renewal', event.resource.id);
+
+  await supabase.from('craiverse_subscriptions').update({
+    credits_used_this_month: 0,
+    credits_reset_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('paypal_subscription_id', subscriptionId);
+}
+
+async function handlePaymentFailed(event: any) {
+  const subscriptionId = event.resource.billing_agreement_id;
+
+  if (!subscriptionId) return;
+
+  const { data: sub } = await supabase
+    .from('craiverse_subscriptions')
+    .select('user_id')
+    .eq('paypal_subscription_id', subscriptionId)
+    .single();
+
+  if (!sub) return;
+
+  await supabase.from('craiverse_subscriptions').update({
+    status: 'past_due',
+    updated_at: new Date().toISOString(),
+  }).eq('paypal_subscription_id', subscriptionId);
+
+  await supabase.from('craiverse_notifications').insert({
+    user_id: sub.user_id,
+    type: 'payment_failed',
+    title: 'Payment Failed ⚠️',
+    message: 'Your PayPal subscription payment failed. Please check your PayPal account.',
+    action_url: '/settings/billing',
+    action_label: 'View Billing',
+    source_app: 'craiverse',
+  });
+}
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now()
+  const body = await request.text();
+  
+  const headers: Record<string, string> = {};
+  request.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value;
+  });
+
+  // Verify webhook signature
+  const isValid = await verifyWebhookSignature(body, headers);
+  if (!isValid) {
+    console.error('Invalid PayPal webhook signature');
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  const event = JSON.parse(body);
 
   try {
-    // Parse request body
-    const body = await request.json()
-    const eventType = body.event_type
-    const eventId = body.id
+    switch (event.event_type) {
+      case 'CHECKOUT.ORDER.APPROVED':
+      case 'PAYMENT.CAPTURE.COMPLETED':
+        await handlePaymentCompleted(event);
+        break;
 
-    // Log webhook receipt
-    console.log(`[PayPal Webhook] Received: ${eventType} (${eventId})`)
+      case 'BILLING.SUBSCRIPTION.ACTIVATED':
+        await handleSubscriptionActivated(event);
+        break;
 
-    // Check idempotency
-    const alreadyProcessed = await checkIdempotency(eventId)
-    if (alreadyProcessed) {
-      console.log(`[PayPal Webhook] Already processed: ${eventId}`)
-      return NextResponse.json({ received: true, status: 'already_processed' })
+      case 'BILLING.SUBSCRIPTION.CANCELLED':
+      case 'BILLING.SUBSCRIPTION.SUSPENDED':
+        await handleSubscriptionCancelled(event);
+        break;
+
+      case 'PAYMENT.SALE.COMPLETED':
+        await handlePaymentSaleCompleted(event);
+        break;
+
+      case 'PAYMENT.SALE.DENIED':
+      case 'BILLING.SUBSCRIPTION.PAYMENT.FAILED':
+        await handlePaymentFailed(event);
+        break;
+
+      default:
+        console.log(`Unhandled PayPal event: ${event.event_type}`);
     }
 
-    // Verify webhook signature
-    const headers = {
-      'paypal-auth-algo': request.headers.get('paypal-auth-algo') || '',
-      'paypal-cert-url': request.headers.get('paypal-cert-url') || '',
-      'paypal-transmission-id': request.headers.get('paypal-transmission-id') || '',
-      'paypal-transmission-sig': request.headers.get('paypal-transmission-sig') || '',
-      'paypal-transmission-time': request.headers.get('paypal-transmission-time') || '',
-    }
-
-    const isValid = await PayPalClient.verifyWebhookSignature(headers, body)
-    if (!isValid) {
-      console.error(`[PayPal Webhook] Invalid signature: ${eventId}`)
-      await logWebhookEvent({
-        event_id: eventId,
-        event_type: eventType,
-        provider: 'paypal',
-        status: 'failed',
-        error: 'Invalid webhook signature',
-        processing_time_ms: Date.now() - startTime,
-      })
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-    }
-
-    // Log processing start
-    await logWebhookEvent({
-      event_id: eventId,
-      event_type: eventType,
-      provider: 'paypal',
-      status: 'processing',
-      metadata: { resource_id: body.resource?.id },
-    })
-
-    // Process event
-    await processWebhookEvent(eventType, body, eventId)
-
-    // Log success
-    await logWebhookEvent({
-      event_id: eventId,
-      event_type: eventType,
-      provider: 'paypal',
-      status: 'success',
-      processing_time_ms: Date.now() - startTime,
-    })
-
-    return NextResponse.json({ received: true, status: 'success' })
+    return NextResponse.json({ received: true });
   } catch (error: any) {
-    logError('[PayPal Webhook] Processing error:', error)
-
-    // Log failure
-    try {
-      const body = await request.json()
-      await logWebhookEvent({
-        event_id: body.id,
-        event_type: body.event_type,
-        provider: 'paypal',
-        status: 'failed',
-        error: error.message,
-        processing_time_ms: Date.now() - startTime,
-      })
-    } catch {}
-
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
-  }
-}
-
-// ============================================================================
-// EVENT PROCESSING
-// ============================================================================
-
-async function processWebhookEvent(eventType: string, body: any, eventId: string) {
-  switch (eventType) {
-    // ========================================================================
-    // PAYMENT EVENTS
-    // ========================================================================
-
-    case 'PAYMENT.CAPTURE.COMPLETED': {
-      const captureId = body.resource.id
-      const customId = body.resource.custom_id
-
-      if (!customId) {
-        console.warn(`[PayPal Webhook] No custom_id in capture: ${captureId}`)
-        break
-      }
-
-      const { userId, credits, type, packageId } = JSON.parse(customId)
-      const amountValue = parseFloat(body.resource.amount.value)
-      const amountCents = Math.round(amountValue * 100)
-
-      // Record payment
-      await supabase.from('payment_transactions').upsert({
-        user_id: userId,
-        amount_cents: amountCents,
-        payment_method: 'paypal',
-        paypal_transaction_id: captureId,
-        status: 'succeeded',
-        description: `${type === 'subscription' ? 'Subscription' : 'Credits'} purchase via PayPal`,
-        metadata: {
-          packageId,
-          credits,
-          type,
-        },
-      }, {
-        onConflict: 'paypal_transaction_id',
-      })
-
-      // Add credits to user
-      await PaymentService.addCredits(
-        userId,
-        parseInt(credits),
-        type === 'subscription' ? 'subscription' : 'purchase',
-        `${type === 'subscription' ? 'Monthly subscription' : 'One-time purchase'} - ${credits} credits`,
-        captureId,
-        'paypal',
-        {
-          packageId,
-          amount: amountValue,
-        }
-      )
-
-      // If subscription, update subscription status
-      if (type === 'subscription') {
-        const tier =
-          parseInt(credits) === 200 ? 'starter' :
-          parseInt(credits) === 750 ? 'pro' :
-          'enterprise'
-
-        await supabase.from('subscriptions').upsert({
-          user_id: userId,
-          tier,
-          status: 'active',
-          payment_method: 'paypal',
-          paypal_subscription_id: body.resource.supplementary_data?.related_ids?.order_id,
-        }, {
-          onConflict: 'user_id',
-        })
-
-        await supabase
-          .from('profiles')
-          .update({ subscription_tier: tier })
-          .eq('id', userId)
-      }
-
-      console.log(`[PayPal Webhook] Payment completed: ${captureId}, ${credits} credits added to user ${userId}`)
-      break
-    }
-
-    case 'PAYMENT.CAPTURE.DENIED':
-    case 'PAYMENT.CAPTURE.DECLINED': {
-      const captureId = body.resource.id
-
-      await supabase
-        .from('payment_transactions')
-        .update({ status: 'failed', error_message: 'Payment denied/declined' })
-        .eq('paypal_transaction_id', captureId)
-
-      console.log(`[PayPal Webhook] Payment denied/declined: ${captureId}`)
-      break
-    }
-
-    case 'PAYMENT.CAPTURE.REFUNDED': {
-      const refundId = body.resource.id
-      const customId = body.resource.custom_id
-
-      if (!customId) break
-
-      const { userId, credits } = JSON.parse(customId)
-
-      // Deduct refunded credits
-      await PaymentService.addCredits(
-        userId,
-        -parseInt(credits),
-        'refund',
-        `PayPal refund - ${credits} credits removed`,
-        refundId,
-        'paypal'
-      )
-
-      console.log(`[PayPal Webhook] Refund processed: ${refundId}, ${credits} credits deducted from user ${userId}`)
-      break
-    }
-
-    // ========================================================================
-    // SUBSCRIPTION EVENTS
-    // ========================================================================
-
-    case 'BILLING.SUBSCRIPTION.ACTIVATED': {
-      const subscriptionId = body.resource.id
-      const customId = body.resource.custom_id
-
-      if (!customId) break
-
-      const { userId, tier } = JSON.parse(customId)
-
-      await supabase.from('subscriptions').upsert({
-        user_id: userId,
-        tier,
-        status: 'active',
-        payment_method: 'paypal',
-        paypal_subscription_id: subscriptionId,
-      }, {
-        onConflict: 'paypal_subscription_id',
-      })
-
-      await supabase
-        .from('profiles')
-        .update({ subscription_tier: tier })
-        .eq('id', userId)
-
-      console.log(`[PayPal Webhook] Subscription activated: ${subscriptionId} for user ${userId}`)
-      break
-    }
-
-    case 'BILLING.SUBSCRIPTION.CANCELLED':
-    case 'BILLING.SUBSCRIPTION.SUSPENDED': {
-      const subscriptionId = body.resource.id
-
-      await supabase
-        .from('subscriptions')
-        .update({
-          status: eventType.includes('CANCELLED') ? 'cancelled' : 'paused',
-          cancelled_at: new Date().toISOString(),
-        })
-        .eq('paypal_subscription_id', subscriptionId)
-
-      const { data: sub } = await supabase
-        .from('subscriptions')
-        .select('user_id')
-        .eq('paypal_subscription_id', subscriptionId)
-        .single()
-
-      if (sub) {
-        await supabase
-          .from('profiles')
-          .update({ subscription_tier: 'free' })
-          .eq('id', sub.user_id)
-      }
-
-      console.log(`[PayPal Webhook] Subscription ${eventType.includes('CANCELLED') ? 'cancelled' : 'suspended'}: ${subscriptionId}`)
-      break
-    }
-
-    case 'BILLING.SUBSCRIPTION.PAYMENT.FAILED': {
-      const subscriptionId = body.resource.id
-
-      await supabase
-        .from('subscriptions')
-        .update({ status: 'past_due' })
-        .eq('paypal_subscription_id', subscriptionId)
-
-      console.log(`[PayPal Webhook] Subscription payment failed: ${subscriptionId}`)
-      break
-    }
-
-    // ========================================================================
-    // UNHANDLED EVENTS
-    // ========================================================================
-
-    default:
-      console.log(`[PayPal Webhook] Unhandled event type: ${eventType}`)
-  }
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-async function checkIdempotency(eventId: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from('webhook_logs')
-      .select('event_id')
-      .eq('event_id', eventId)
-      .eq('status', 'success')
-      .single()
-
-    if (error && error.code !== 'PGRST116') {
-      logError('Idempotency check error:', error)
-      return false
-    }
-
-    return !!data
-  } catch (error: unknown) {
-    logError('Idempotency check failed:', error)
-    return false
-  }
-}
-
-async function logWebhookEvent(log: {
-  event_id: string
-  event_type: string
-  provider: string
-  status: string
-  metadata?: any
-  error?: string
-  processing_time_ms?: number
-}): Promise<void> {
-  try {
-    await supabase
-      .from('webhook_logs')
-      .upsert(log, {
-        onConflict: 'event_id',
-      })
-  } catch (error: unknown) {
-    logError('Failed to log webhook event:', error)
+    console.error('PayPal webhook error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
