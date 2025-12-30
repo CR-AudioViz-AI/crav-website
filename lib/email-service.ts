@@ -303,3 +303,11 @@ export default {
   sendPricePrediction,
   sendWelcomeEmail,
 };
+
+// Named export for emailTemplates (alias for default)
+export const emailTemplates = {
+  sendEmail,
+  sendDealAlert,
+  sendPricePrediction,
+  sendWelcomeEmail,
+};
