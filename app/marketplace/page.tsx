@@ -1,348 +1,485 @@
+// /app/marketplace/page.tsx
+// Creator Marketplace - CR AudioViz AI
+// Browse, buy, and sell digital products with 70/30 creator split
+
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MobileButton, MobileInput } from '@/components/mobile';
-import { 
-  Search, TrendingUp, Star, Download,
-  ShoppingCart, Tag, Users, DollarSign, Sparkles
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
 
-const categories = ['All Items', 'Templates', 'Games', 'Apps', 'Components', 'Graphics', 'Music', '3D Assets'];
+// =============================================================================
+// TYPES
+// =============================================================================
 
-const marketplaceItems = [
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price: number; // in credits
+  category: string;
+  thumbnail: string;
+  creator: {
+    id: string;
+    name: string;
+    avatar: string;
+    verified: boolean;
+  };
+  stats: {
+    sales: number;
+    rating: number;
+    reviews: number;
+  };
+  tags: string[];
+  featured?: boolean;
+  isNew?: boolean;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  count: number;
+}
+
+// =============================================================================
+// MOCK DATA
+// =============================================================================
+
+const CATEGORIES: Category[] = [
+  { id: 'all', name: 'All Products', icon: '🏪', count: 0 },
+  { id: 'templates', name: 'Templates', icon: '📄', count: 45 },
+  { id: 'graphics', name: 'Graphics', icon: '🎨', count: 128 },
+  { id: 'logos', name: 'Logo Packs', icon: '✨', count: 67 },
+  { id: 'prompts', name: 'AI Prompts', icon: '🤖', count: 234 },
+  { id: 'presets', name: 'Presets', icon: '🎛️', count: 89 },
+  { id: 'fonts', name: 'Fonts', icon: '🔤', count: 56 },
+  { id: 'icons', name: 'Icon Packs', icon: '🎯', count: 78 },
+  { id: 'photos', name: 'Photos', icon: '📸', count: 312 },
+  { id: 'audio', name: 'Audio', icon: '🎵', count: 145 },
+  { id: 'video', name: 'Video', icon: '🎬', count: 67 },
+  { id: 'code', name: 'Code', icon: '💻', count: 89 }
+];
+
+const SAMPLE_PRODUCTS: Product[] = [
   {
-    id: 1,
-    title: "Modern E-Commerce Template",
-    creator: "DesignPro",
-    price: 49,
-    rating: 4.8,
-    sales: 1250,
-    category: "Templates"
+    id: '1',
+    title: 'Professional Business Card Templates',
+    description: '50 premium business card designs, fully customizable',
+    price: 25,
+    category: 'templates',
+    thumbnail: '💼',
+    creator: { id: 'c1', name: 'DesignPro', avatar: '👨‍🎨', verified: true },
+    stats: { sales: 1234, rating: 4.9, reviews: 456 },
+    tags: ['business', 'cards', 'professional'],
+    featured: true
   },
   {
-    id: 2,
-    title: "2D Platformer Game Kit",
-    creator: "GameDevStudio",
-    price: 99,
-    rating: 4.9,
-    sales: 890,
-    category: "Games"
+    id: '2',
+    title: 'AI Art Prompt Collection - Fantasy',
+    description: '100 detailed prompts for stunning fantasy artwork',
+    price: 15,
+    category: 'prompts',
+    thumbnail: '🐉',
+    creator: { id: 'c2', name: 'PromptMaster', avatar: '🧙', verified: true },
+    stats: { sales: 2567, rating: 4.8, reviews: 892 },
+    tags: ['ai', 'prompts', 'fantasy', 'art'],
+    featured: true
   },
   {
-    id: 3,
-    title: "AI Chatbot Component",
-    creator: "CodeMaster",
-    price: 79,
-    rating: 4.7,
-    sales: 2100,
-    category: "Components"
+    id: '3',
+    title: 'Minimal Logo Pack - 200 Designs',
+    description: 'Clean, modern logo templates for any business',
+    price: 35,
+    category: 'logos',
+    thumbnail: '◯',
+    creator: { id: 'c3', name: 'LogoStudio', avatar: '🎨', verified: true },
+    stats: { sales: 890, rating: 4.7, reviews: 234 },
+    tags: ['logos', 'minimal', 'modern'],
+    featured: true
   },
   {
-    id: 4,
-    title: "Portfolio Website Bundle",
-    creator: "WebWizard",
-    price: 39,
-    rating: 4.6,
-    sales: 1580,
-    category: "Templates"
+    id: '4',
+    title: 'Social Media Template Bundle',
+    description: 'Instagram, TikTok, YouTube - 150 templates',
+    price: 20,
+    category: 'templates',
+    thumbnail: '📱',
+    creator: { id: 'c4', name: 'SocialKing', avatar: '👑', verified: false },
+    stats: { sales: 3421, rating: 4.6, reviews: 1023 },
+    tags: ['social', 'templates', 'instagram'],
+    isNew: true
   },
   {
-    id: 5,
-    title: "Puzzle Game Collection",
-    creator: "PuzzleMania",
-    price: 59,
-    rating: 4.9,
-    sales: 950,
-    category: "Games"
+    id: '5',
+    title: 'Hand-Drawn Icon Set - 500 Icons',
+    description: 'Unique hand-drawn style icons in multiple formats',
+    price: 18,
+    category: 'icons',
+    thumbnail: '✏️',
+    creator: { id: 'c5', name: 'IconArtist', avatar: '🖌️', verified: true },
+    stats: { sales: 567, rating: 4.9, reviews: 178 },
+    tags: ['icons', 'hand-drawn', 'unique']
   },
   {
-    id: 6,
-    title: "Icon Pack Pro (500+)",
-    creator: "IconDesigner",
-    price: 29,
-    rating: 4.8,
-    sales: 3200,
-    category: "Graphics"
+    id: '6',
+    title: 'Cinematic LUTs Pack',
+    description: '25 professional color grading presets for video',
+    price: 30,
+    category: 'presets',
+    thumbnail: '🎬',
+    creator: { id: 'c6', name: 'ColorGrade', avatar: '🎥', verified: true },
+    stats: { sales: 789, rating: 4.8, reviews: 267 },
+    tags: ['video', 'luts', 'color']
+  },
+  {
+    id: '7',
+    title: 'Ambient Music Loops - 50 Tracks',
+    description: 'Royalty-free ambient background music',
+    price: 22,
+    category: 'audio',
+    thumbnail: '🎧',
+    creator: { id: 'c7', name: 'SoundWave', avatar: '🎹', verified: false },
+    stats: { sales: 432, rating: 4.5, reviews: 145 },
+    tags: ['music', 'ambient', 'royalty-free'],
+    isNew: true
+  },
+  {
+    id: '8',
+    title: 'React Component Library',
+    description: '75 production-ready React components with TypeScript',
+    price: 45,
+    category: 'code',
+    thumbnail: '⚛️',
+    creator: { id: 'c8', name: 'DevPro', avatar: '👨‍💻', verified: true },
+    stats: { sales: 234, rating: 4.9, reviews: 89 },
+    tags: ['react', 'typescript', 'components']
   }
 ];
 
-export default function MarketplacePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Items');
+// =============================================================================
+// COMPONENTS
+// =============================================================================
 
-  const filteredItems = marketplaceItems.filter(item => {
-    const matchesSearch = 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.creator.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = 
-      selectedCategory === 'All Items' || item.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
+function ProductCard({ product }: { product: Product }) {
+  return (
+    <motion.div
+      whileHover={{ y: -4 }}
+      className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+    >
+      {/* Thumbnail */}
+      <div className="h-40 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center relative">
+        <span className="text-6xl">{product.thumbnail}</span>
+        
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex gap-2">
+          {product.featured && (
+            <span className="px-2 py-1 bg-yellow-500 text-white text-xs font-medium rounded-full">
+              ⭐ Featured
+            </span>
+          )}
+          {product.isNew && (
+            <span className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
+              New
+            </span>
+          )}
+        </div>
+        
+        {/* Price */}
+        <div className="absolute top-3 right-3">
+          <span className="px-3 py-1 bg-white dark:bg-gray-800 rounded-full text-sm font-bold text-gray-900 dark:text-white shadow-lg">
+            {product.price} credits
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        <h3 className="font-bold text-gray-900 dark:text-white mb-1 line-clamp-1">
+          {product.title}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+          {product.description}
+        </p>
+
+        {/* Creator */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xl">{product.creator.avatar}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            {product.creator.name}
+          </span>
+          {product.creator.verified && (
+            <span className="text-blue-500" title="Verified Creator">✓</span>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+          <span>⭐ {product.stats.rating} ({product.stats.reviews})</span>
+          <span>📦 {product.stats.sales.toLocaleString()} sold</span>
+        </div>
+      </div>
+
+      {/* Action */}
+      <div className="px-4 pb-4">
+        <Link
+          href={`/marketplace/product/${product.id}`}
+          className="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg font-medium transition-colors"
+        >
+          View Details
+        </Link>
+      </div>
+    </motion.div>
+  );
+}
+
+function CreatorCTA() {
+  return (
+    <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white">
+      <div className="max-w-3xl mx-auto text-center">
+        <h2 className="text-3xl font-bold mb-4">Become a Creator 🎨</h2>
+        <p className="text-purple-100 mb-6 text-lg">
+          Sell your digital products and keep 70% of every sale. 
+          Templates, prompts, graphics, code - if you made it, you can sell it.
+        </p>
+        
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/10 rounded-xl p-4 backdrop-blur">
+            <div className="text-3xl mb-2">💰</div>
+            <div className="font-bold">70% Revenue</div>
+            <div className="text-sm text-purple-200">You keep the majority</div>
+          </div>
+          <div className="bg-white/10 rounded-xl p-4 backdrop-blur">
+            <div className="text-3xl mb-2">🚀</div>
+            <div className="font-bold">Instant Payouts</div>
+            <div className="text-sm text-purple-200">Weekly to your account</div>
+          </div>
+          <div className="bg-white/10 rounded-xl p-4 backdrop-blur">
+            <div className="text-3xl mb-2">📊</div>
+            <div className="font-bold">Full Analytics</div>
+            <div className="text-sm text-purple-200">Track every sale</div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/marketplace/sell"
+            className="px-8 py-3 bg-white text-purple-600 rounded-xl font-bold hover:bg-purple-50 transition-colors"
+          >
+            Start Selling →
+          </Link>
+          <Link
+            href="/marketplace/creator-guide"
+            className="px-8 py-3 border-2 border-white/50 rounded-xl font-medium hover:bg-white/10 transition-colors"
+          >
+            Creator Guide
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// MAIN PAGE
+// =============================================================================
+
+export default function MarketplacePage() {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('popular');
+  const [products, setProducts] = useState<Product[]>(SAMPLE_PRODUCTS);
+
+  // Filter products
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesSearch = searchQuery === '' ||
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
   });
 
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'popular':
+        return b.stats.sales - a.stats.sales;
+      case 'newest':
+        return b.isNew ? 1 : -1;
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'rating':
+        return b.stats.rating - a.stats.rating;
+      default:
+        return 0;
+    }
+  });
+
+  const featuredProducts = products.filter(p => p.featured);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <ShoppingCart className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
-              Creator Marketplace
-            </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
-              Buy and sell apps, games, templates, and digital assets
-            </p>
-            
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto">
-              <MobileInput
-                type="search"
-                placeholder="Search marketplace..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                icon={<Search className="w-5 h-5" />}
-                className="bg-white/90 text-gray-900"
-              />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white text-xl">🏪</span>
+                </div>
+              </Link>
+              <div>
+                <h1 className="font-bold text-gray-900 dark:text-white">Creator Marketplace</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Buy & sell digital products</p>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="flex-1 max-w-lg mx-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                />
+                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4">
+              <Link href="/marketplace/sell" className="px-4 py-2 border border-purple-500 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-sm font-medium">
+                Sell Products
+              </Link>
+              <Link href="/dashboard" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium">
+                My Purchases
+              </Link>
             </div>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Stats Bar */}
-      <section className="px-4 py-8 md:py-12 bg-white">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-purple-600 mb-1">12,450+</div>
-              <div className="text-xs md:text-sm text-gray-600">Total Items</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-pink-600 mb-1">8,920</div>
-              <div className="text-xs md:text-sm text-gray-600">Creators</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-red-600 mb-1">$2.4M</div>
-              <div className="text-xs md:text-sm text-gray-600">Creator Earnings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-orange-600 mb-1">70%</div>
-              <div className="text-xs md:text-sm text-gray-600">Revenue Share</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="px-4 py-6 md:py-8 bg-gray-50 border-y">
-        <div className="container mx-auto">
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 md:flex-wrap">
-            {categories.map((category) => (
+      {/* Category Bar */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-1 py-2">
+            {CATEGORIES.map(cat => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-3 rounded-lg font-medium whitespace-nowrap transition-all flex-shrink-0 text-sm ${
-                  selectedCategory === category
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === cat.id
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                {category}
+                <span className="mr-1.5">{cat.icon}</span>
+                {cat.name}
+                {cat.id !== 'all' && (
+                  <span className="ml-1.5 text-xs text-gray-400">({cat.count})</span>
+                )}
               </button>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Marketplace Items */}
-      <section className="px-4 py-12 md:py-16 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-6 md:mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {selectedCategory}
-              </h2>
-              <div className="text-sm md:text-base text-gray-600">
-                {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {filteredItems.map((item) => (
-                <Card key={item.id} className="hover:shadow-xl transition-all">
-                  {/* Item Image Placeholder */}
-                  <div className="h-40 md:h-48 bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center relative">
-                    <Sparkles className="w-16 h-16 text-white/30" />
-                    {item.rating >= 4.8 && (
-                      <div className="absolute top-3 right-3 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        ⭐ Best Seller
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent className="p-4 md:p-6">
-                    {/* Category Badge */}
-                    <div className="mb-2">
-                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
-                        {item.category}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                      {item.title}
-                    </h3>
-
-                    {/* Creator */}
-                    <p className="text-xs md:text-sm text-gray-600 mb-3">
-                      by {item.creator}
-                    </p>
-
-                    {/* Stats */}
-                    <div className="flex items-center gap-3 mb-4 text-xs md:text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{item.rating}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Download className="w-4 h-4" />
-                        <span>{item.sales.toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    {/* Price & CTA */}
-                    <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">
-                        ${item.price}
-                      </div>
-                      <Link href={`/marketplace/${item.id}`}>
-                        <MobileButton size="sm" className="bg-purple-600 hover:bg-purple-700">
-                          View Details
-                        </MobileButton>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Featured Section */}
+        {selectedCategory === 'all' && searchQuery === '' && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              ⭐ Featured Products
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
+          </section>
+        )}
 
-            {/* No Results */}
-            {filteredItems.length === 0 && (
-              <div className="text-center py-12">
-                <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No items found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search or filters</p>
-                <MobileButton
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('All Items');
-                  }}
-                  variant="outline"
-                >
-                  Clear Filters
-                </MobileButton>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Become a Seller CTA */}
-      <section className="px-4 py-12 md:py-16 bg-white">
-        <div className="container mx-auto">
-          <Card className="max-w-5xl mx-auto border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white">
-            <CardHeader className="p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-purple-600" />
-                </div>
-                <CardTitle className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-                  Become a Seller
-                </CardTitle>
-              </div>
-              <p className="text-sm md:text-base lg:text-lg text-gray-600">
-                Earn 70% revenue share by selling your creations on our marketplace
-              </p>
-            </CardHeader>
-            <CardContent className="p-6 md:p-8 pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-2xl mb-2">💰</div>
-                  <p className="font-semibold text-gray-900 text-sm md:text-base mb-1">
-                    70% Revenue Share
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    Keep most of your earnings
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-2xl mb-2">🚀</div>
-                  <p className="font-semibold text-gray-900 text-sm md:text-base mb-1">
-                    Easy Setup
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    List items in minutes
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-2xl mb-2">🌍</div>
-                  <p className="font-semibold text-gray-900 text-sm md:text-base mb-1">
-                    Global Reach
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    Access 100K+ buyers
-                  </p>
-                </div>
-              </div>
-              <Link href="/marketplace/sell" className="block">
-                <MobileButton 
-                  fullWidth
-                  size="lg"
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  Start Selling
-                </MobileButton>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            Ready to Explore?
-          </h2>
-          <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
-            Discover thousands of premium assets from talented creators worldwide
+        {/* Sort & Filter Bar */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-gray-600 dark:text-gray-400">
+            {sortedProducts.length} products found
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <Link href="/signup" className="flex-1">
-              <MobileButton 
-                size="lg" 
-                fullWidth
-                className="bg-white text-purple-600 hover:bg-purple-50"
-              >
-                Browse Marketplace
-              </MobileButton>
-            </Link>
-            <Link href="/marketplace/sell" className="flex-1">
-              <MobileButton 
-                size="lg" 
-                fullWidth
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10"
-              >
-                Start Selling
-              </MobileButton>
-            </Link>
-          </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+          >
+            <option value="popular">Most Popular</option>
+            <option value="newest">Newest First</option>
+            <option value="rating">Highest Rated</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
         </div>
-      </section>
+
+        {/* Products Grid */}
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          {sortedProducts.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {sortedProducts.length === 0 && (
+          <div className="text-center py-16">
+            <span className="text-6xl mb-4 block">🔍</span>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              No products found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        )}
+
+        {/* Creator CTA */}
+        <CreatorCTA />
+
+        {/* How It Works */}
+        <section className="mt-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-12">
+            How It Works
+          </h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { icon: '🔍', title: 'Browse', desc: 'Find the perfect digital product' },
+              { icon: '💳', title: 'Purchase', desc: 'Pay with your Javari credits' },
+              { icon: '📥', title: 'Download', desc: 'Instant access to your files' },
+              { icon: '🚀', title: 'Create', desc: 'Use in your projects immediately' }
+            ].map((step, idx) => (
+              <div key={idx} className="text-center">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                  {step.icon}
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-8 px-4 mt-16">
+        <div className="max-w-7xl mx-auto text-center">
+          <p>© 2025 CR AudioViz AI, LLC. All rights reserved.</p>
+          <p className="text-sm mt-2">Creators keep 70% of every sale.</p>
+        </div>
+      </footer>
     </div>
   );
 }
