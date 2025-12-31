@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { v4 as uuidv4 } from 'uuid'
+import crypto from 'crypto'
 
 // Initialize Supabase with service role for admin operations
 const supabase = createClient(
@@ -81,11 +81,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Generate file path
+    // Generate file path using crypto instead of uuid
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'bin'
     const slug = title 
       ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      : uuidv4()
+      : crypto.randomUUID()
     const filePath = `${category}/${slug}.${fileExt}`
 
     // Upload to Supabase Storage
@@ -130,7 +130,6 @@ export async function POST(request: NextRequest) {
 
     if (productError) {
       console.error('Product creation error:', productError)
-      // Clean up uploaded file
       await supabase.storage.from('digital-products').remove([filePath])
       return NextResponse.json({ error: 'Product creation failed', details: productError.message }, { status: 500 })
     }
@@ -171,14 +170,22 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     let query = supabase
-      .from('v_digital_products')
+      .from('digital_products')
       .select('*', { count: 'exact' })
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
     if (category) {
-      query = query.eq('category_slug', category)
+      const { data: categoryData } = await supabase
+        .from('digital_product_categories')
+        .select('id')
+        .eq('slug', category)
+        .single()
+      
+      if (categoryData) {
+        query = query.eq('category_id', categoryData.id)
+      }
     }
 
     const { data, error, count } = await query
