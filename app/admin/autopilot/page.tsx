@@ -3,16 +3,15 @@
  * ==========================================
  * 
  * The central nervous system for autonomous operations.
- * Implements the Autopilot Loop:
- * Observe → Test → Score → Recommend → Fix → Verify → Report
+ * Now wired to real /api/admin/autopilot endpoint.
  * 
- * @version 1.0.0
+ * @version 2.0.0
  * @date January 1, 2026
  */
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface SystemHealth {
   name: string
@@ -20,258 +19,325 @@ interface SystemHealth {
   lastCheck: string
   score: number
   details?: string
+  fixable?: boolean
+  tier?: 0 | 1 | 2
 }
 
 interface AutopilotAction {
   id: string
-  type: 'observe' | 'test' | 'fix' | 'verify'
+  type: 'observe' | 'test' | 'fix' | 'verify' | 'report'
   target: string
-  status: 'pending' | 'running' | 'completed' | 'failed'
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'needs_approval'
   tier: 0 | 1 | 2
   description: string
   timestamp: string
   result?: string
 }
 
-export default function AutopilotControlCenter() {
-  const [systems, setSystems] = useState<SystemHealth[]>([])
-  const [actions, setActions] = useState<AutopilotAction[]>([])
-  const [loading, setLoading] = useState(true)
-  const [autopilotEnabled, setAutopilotEnabled] = useState(false)
-  const [currentTier, setCurrentTier] = useState<0 | 1 | 2>(0)
+interface AutopilotState {
+  enabled: boolean
+  tier: 0 | 1 | 2
+  lastRun: string | null
+  systemHealth: SystemHealth[]
+  pendingActions: AutopilotAction[]
+  completedActions: AutopilotAction[]
+  overallScore: number
+}
 
-  useEffect(() => {
-    loadDashboardData()
+export default function AutopilotControlCenter() {
+  const [autopilot, setAutopilot] = useState<AutopilotState | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [actionInProgress, setActionInProgress] = useState(false)
+
+  const fetchAutopilotStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/autopilot?action=status')
+      const data = await res.json()
+      if (data.success) {
+        setAutopilot(data.autopilot)
+        setError(null)
+      } else {
+        setError(data.error || 'Failed to fetch status')
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  async function loadDashboardData() {
-    setLoading(true)
+  useEffect(() => {
+    fetchAutopilotStatus()
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchAutopilotStatus, 30000)
+    return () => clearInterval(interval)
+  }, [fetchAutopilotStatus])
+
+  async function toggleAutopilot() {
+    setActionInProgress(true)
     try {
-      // Load system health
-      const healthRes = await fetch('/api/health')
-      const healthData = await healthRes.json()
-      
-      setSystems([
-        {
-          name: 'Javari AI',
-          status: healthData.status === 'healthy' ? 'healthy' : 'warning',
-          lastCheck: new Date().toISOString(),
-          score: healthData.summary?.passed === 3 ? 100 : 50,
-          details: `${healthData.summary?.passed || 0}/3 checks passed`
-        },
-        {
-          name: 'Central API Hub',
-          status: 'healthy',
-          lastCheck: new Date().toISOString(),
-          score: 100,
-          details: '60+ endpoints operational'
-        },
-        {
-          name: 'Vercel Projects',
-          status: 'healthy',
-          lastCheck: new Date().toISOString(),
-          score: 100,
-          details: '143/143 READY'
-        },
-        {
-          name: 'Supabase Database',
-          status: healthData.checks?.database?.status === 'pass' ? 'healthy' : 'warning',
-          lastCheck: new Date().toISOString(),
-          score: healthData.checks?.database?.status === 'pass' ? 100 : 50,
-          details: healthData.checks?.database?.message || 'Unknown'
-        },
-        {
-          name: 'Payment Systems',
-          status: 'healthy',
-          lastCheck: new Date().toISOString(),
-          score: 100,
-          details: 'Stripe + PayPal operational'
-        }
-      ])
-
-      // Load recent actions
-      setActions([
-        {
-          id: '1',
-          type: 'observe',
-          target: 'All Systems',
-          status: 'completed',
-          tier: 0,
-          description: 'Daily health check scan',
-          timestamp: new Date().toISOString(),
-          result: 'All systems operational'
-        }
-      ])
-
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-    }
-    setLoading(false)
-  }
-
-  async function runAutopilotCycle() {
-    setActions(prev => [{
-      id: Date.now().toString(),
-      type: 'observe',
-      target: 'Ecosystem',
-      status: 'running',
-      tier: currentTier,
-      description: 'Running autopilot cycle...',
-      timestamp: new Date().toISOString()
-    }, ...prev])
-
-    try {
-      // Step 1: Observe - Run compliance check
-      const complianceRes = await fetch('/api/admin/compliance-check', { method: 'POST' })
-      const complianceData = await complianceRes.json()
-
-      setActions(prev => [{
-        id: Date.now().toString(),
-        type: 'test',
-        target: 'Compliance',
-        status: 'completed',
-        tier: currentTier,
-        description: `Compliance audit: ${complianceData.summary?.average_score || 0}% average score`,
-        timestamp: new Date().toISOString(),
-        result: `${complianceData.summary?.fully_compliant || 0} fully compliant, ${complianceData.summary?.non_compliant || 0} need attention`
-      }, ...prev.slice(1)])
-
-    } catch (error: any) {
-      setActions(prev => [{
-        ...prev[0],
-        status: 'failed',
-        result: error.message
-      }, ...prev.slice(1)])
+      const action = autopilot?.enabled ? 'disable' : 'enable'
+      const res = await fetch('/api/admin/autopilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, tier: 0 })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAutopilot(data.autopilot)
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setActionInProgress(false)
     }
   }
 
-  const statusColors = {
-    healthy: 'bg-green-500',
-    warning: 'bg-yellow-500',
-    critical: 'bg-red-500',
-    unknown: 'bg-gray-500'
+  async function setTier(newTier: 0 | 1 | 2) {
+    setActionInProgress(true)
+    try {
+      const res = await fetch('/api/admin/autopilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setTier', tier: newTier })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAutopilot(data.autopilot)
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setActionInProgress(false)
+    }
   }
 
-  const tierDescriptions = {
-    0: 'Observe Only - No automatic changes',
-    1: 'Safe Auto-Fix - Lint, formatting, simple TS fixes',
-    2: 'Full Auto - Requires approval for critical changes'
+  async function runAutopilotLoop() {
+    setActionInProgress(true)
+    try {
+      const res = await fetch('/api/admin/autopilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'run' })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAutopilot(data.autopilot)
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setActionInProgress(false)
+    }
+  }
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case 'healthy': return 'bg-green-500'
+      case 'warning': return 'bg-yellow-500'
+      case 'critical': return 'bg-red-500'
+      default: return 'bg-gray-500'
+    }
+  }
+
+  function getStatusBg(status: string) {
+    switch (status) {
+      case 'healthy': return 'bg-green-50 border-green-200'
+      case 'warning': return 'bg-yellow-50 border-yellow-200'
+      case 'critical': return 'bg-red-50 border-red-200'
+      default: return 'bg-gray-50 border-gray-200'
+    }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">🤖 Autopilot Control Center</h1>
-            <p className="text-gray-400 mt-1">Observe → Test → Score → Recommend → Fix → Verify → Report</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <select 
-              value={currentTier}
-              onChange={(e) => setCurrentTier(Number(e.target.value) as 0 | 1 | 2)}
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2"
-            >
-              <option value={0}>Tier 0: Observe Only</option>
-              <option value={1}>Tier 1: Safe Auto-Fix</option>
-              <option value={2}>Tier 2: Full Auto (Approval)</option>
-            </select>
-            <button
-              onClick={runAutopilotCycle}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium"
-            >
-              Run Cycle
-            </button>
-          </div>
-        </div>
-
-        {/* Tier Description */}
-        <div className="bg-gray-800 rounded-lg p-4 mb-8">
-          <p className="text-sm text-gray-300">
-            <span className="font-semibold text-blue-400">Current Mode:</span> {tierDescriptions[currentTier]}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Autopilot Control Center</h1>
+          <p className="text-gray-500 mt-1">
+            Autonomous monitoring and self-healing operations
           </p>
         </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={runAutopilotLoop}
+            disabled={actionInProgress}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+          >
+            {actionInProgress ? (
+              <span className="animate-spin">⟳</span>
+            ) : (
+              <span>▶</span>
+            )}
+            Run Loop
+          </button>
+          <button
+            onClick={toggleAutopilot}
+            disabled={actionInProgress}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              autopilot?.enabled
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            } disabled:opacity-50`}
+          >
+            {autopilot?.enabled ? 'Disable Autopilot' : 'Enable Autopilot'}
+          </button>
+        </div>
+      </div>
 
-        {/* System Health Grid */}
-        <h2 className="text-xl font-semibold mb-4">System Health</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          {systems.map((system) => (
-            <div key={system.name} className="bg-gray-800 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">{system.name}</span>
-                <span className={`w-3 h-3 rounded-full ${statusColors[system.status]}`}></span>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+          {error}
+        </div>
+      )}
+
+      {/* Status Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-sm text-gray-500">Status</div>
+          <div className={`text-2xl font-bold ${autopilot?.enabled ? 'text-green-600' : 'text-gray-400'}`}>
+            {autopilot?.enabled ? 'ACTIVE' : 'DISABLED'}
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-sm text-gray-500">Current Tier</div>
+          <div className="text-2xl font-bold text-blue-600">
+            Tier {autopilot?.tier ?? 0}
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-sm text-gray-500">Health Score</div>
+          <div className={`text-2xl font-bold ${
+            (autopilot?.overallScore ?? 0) >= 80 ? 'text-green-600' :
+            (autopilot?.overallScore ?? 0) >= 50 ? 'text-yellow-600' : 'text-red-600'
+          }`}>
+            {autopilot?.overallScore ?? 0}%
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-sm text-gray-500">Last Run</div>
+          <div className="text-lg font-medium text-gray-700">
+            {autopilot?.lastRun 
+              ? new Date(autopilot.lastRun).toLocaleTimeString()
+              : 'Never'}
+          </div>
+        </div>
+      </div>
+
+      {/* Tier Selection */}
+      <div className="bg-white rounded-lg border p-6">
+        <h2 className="text-lg font-semibold mb-4">Autonomous Operation Tier</h2>
+        <div className="grid grid-cols-3 gap-4">
+          {[0, 1, 2].map((tier) => (
+            <button
+              key={tier}
+              onClick={() => setTier(tier as 0 | 1 | 2)}
+              disabled={actionInProgress}
+              className={`p-4 rounded-lg border-2 text-left transition-all ${
+                autopilot?.tier === tier
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="font-semibold">Tier {tier}</div>
+              <div className="text-sm text-gray-500 mt-1">
+                {tier === 0 && 'Observe Only - Read-only monitoring'}
+                {tier === 1 && 'Safe Auto-Fix - Restart services, clear caches'}
+                {tier === 2 && 'Full Auto - Code changes, deployments (approval required)'}
               </div>
-              <div className="text-2xl font-bold text-blue-400">{system.score}%</div>
-              <p className="text-xs text-gray-400 mt-1">{system.details}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* System Health */}
+      <div className="bg-white rounded-lg border p-6">
+        <h2 className="text-lg font-semibold mb-4">System Health</h2>
+        <div className="space-y-3">
+          {autopilot?.systemHealth.map((system, index) => (
+            <div
+              key={index}
+              className={`flex items-center justify-between p-4 rounded-lg border ${getStatusBg(system.status)}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${getStatusColor(system.status)}`}></div>
+                <div>
+                  <div className="font-medium">{system.name}</div>
+                  <div className="text-sm text-gray-500">{system.details}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-semibold">{system.score}%</div>
+                <div className="text-xs text-gray-500">
+                  {new Date(system.lastCheck).toLocaleTimeString()}
+                </div>
+              </div>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Overall Score */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-medium opacity-90">Overall Ecosystem Score</h3>
-              <p className="text-sm opacity-75">Based on all system checks</p>
-            </div>
-            <div className="text-5xl font-bold">
-              {Math.round(systems.reduce((sum, s) => sum + s.score, 0) / systems.length)}%
-            </div>
+      {/* Pending Actions */}
+      {autopilot?.pendingActions && autopilot.pendingActions.length > 0 && (
+        <div className="bg-white rounded-lg border p-6">
+          <h2 className="text-lg font-semibold mb-4">Pending Actions</h2>
+          <div className="space-y-3">
+            {autopilot.pendingActions.map((action) => (
+              <div
+                key={action.id}
+                className="flex items-center justify-between p-4 rounded-lg border bg-yellow-50 border-yellow-200"
+              >
+                <div>
+                  <div className="font-medium">{action.target}</div>
+                  <div className="text-sm text-gray-600">{action.description}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    action.status === 'needs_approval' 
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {action.status}
+                  </span>
+                  <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                    Tier {action.tier}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      )}
 
-        {/* Recent Actions */}
-        <h2 className="text-xl font-semibold mb-4">Recent Autopilot Actions</h2>
-        <div className="bg-gray-800 rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-700">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium">Type</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Target</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Tier</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Description</th>
-                <th className="px-4 py-3 text-left text-sm font-medium">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {actions.map((action) => (
-                <tr key={action.id} className="border-t border-gray-700">
-                  <td className="px-4 py-3 text-sm capitalize">{action.type}</td>
-                  <td className="px-4 py-3 text-sm">{action.target}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      action.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                      action.status === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                      action.status === 'failed' ? 'bg-red-500/20 text-red-400' :
-                      'bg-gray-500/20 text-gray-400'
-                    }`}>
-                      {action.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">Tier {action.tier}</td>
-                  <td className="px-4 py-3 text-sm text-gray-300">{action.description}</td>
-                  <td className="px-4 py-3 text-sm text-gray-400">
-                    {new Date(action.timestamp).toLocaleTimeString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          CR AudioViz AI - Autopilot Control Center v1.0.0 | January 1, 2026
+      {/* Autopilot Loop Visualization */}
+      <div className="bg-white rounded-lg border p-6">
+        <h2 className="text-lg font-semibold mb-4">Autopilot Loop</h2>
+        <div className="flex items-center justify-between">
+          {['Observe', 'Test', 'Score', 'Recommend', 'Fix', 'Verify', 'Report'].map((step, index) => (
+            <div key={step} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${
+                  index === 0 ? 'bg-blue-600' : 'bg-gray-300'
+                }`}>
+                  {index + 1}
+                </div>
+                <div className="text-xs mt-1 text-gray-600">{step}</div>
+              </div>
+              {index < 6 && (
+                <div className="w-8 h-0.5 bg-gray-300 mx-1"></div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
