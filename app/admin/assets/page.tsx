@@ -141,32 +141,98 @@ export default function AssetManagerPage() {
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null)
   const [isPrinting, setIsPrinting] = useState(false)
 
-  // Print to Epson function
-  const printReport = async (type: 'all' | 'category') => {
+  // Print Report - Opens browser print dialog
+  const printReport = () => {
     setIsPrinting(true)
-    try {
-      const res = await fetch('/api/print', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'asset-list',
-          title: type === 'category' && selectedCategory 
-            ? categories.find(c => c.slug === selectedCategory)?.name 
-            : 'All Assets',
-          category: type === 'category' ? selectedCategory : undefined
-        })
-      })
-      const data = await res.json()
-      if (data.success) {
-        alert('✅ Print job sent to Epson printer!')
-      } else {
-        alert('❌ Print failed: ' + (data.error || 'Unknown error'))
-      }
-    } catch (error) {
-      alert('❌ Print failed: Network error')
-    } finally {
+    
+    const categoryName = selectedCategory 
+      ? categories.find(c => c.slug === selectedCategory)?.name || 'Assets'
+      : 'All Assets'
+    
+    const now = new Date().toLocaleString('en-US', { 
+      timeZone: 'America/New_York',
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })
+    
+    const totalSize = filteredAssets.reduce((sum, a) => sum + (a.file_size_bytes || 0), 0)
+    
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      alert('Please allow popups to print')
       setIsPrinting(false)
+      return
     }
+    
+    printWindow.document.write(\`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>\${categoryName} - Asset Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11px; margin: 20px; color: #333; }
+    h1 { font-size: 18px; color: #7c3aed; margin-bottom: 5px; }
+    .subtitle { color: #666; font-size: 10px; margin-bottom: 15px; }
+    .stats { background: #f5f5f5; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+    .stats span { margin-right: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th { background: #7c3aed; color: white; padding: 8px 5px; text-align: left; }
+    td { padding: 6px 5px; border-bottom: 1px solid #eee; }
+    tr:nth-child(even) { background: #fafafa; }
+    .footer { margin-top: 20px; font-size: 9px; color: #999; text-align: center; }
+    @media print { body { margin: 0; } }
+  </style>
+</head>
+<body>
+  <h1>✨ \${categoryName}</h1>
+  <div class="subtitle">CR AudioViz AI Asset Manager • Generated: \${now} EST</div>
+  
+  <div class="stats">
+    <span><strong>Total Assets:</strong> \${filteredAssets.length}</span>
+    <span><strong>Total Size:</strong> \${formatBytes(totalSize)}</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Size</th>
+        <th>Created</th>
+        <th>Downloads</th>
+      </tr>
+    </thead>
+    <tbody>
+      \${filteredAssets.map((asset, i) => \`
+        <tr>
+          <td>\${i + 1}</td>
+          <td>\${asset.name || asset.original_filename}</td>
+          <td>\${(asset.file_extension || '').toUpperCase()}</td>
+          <td>\${formatBytes(asset.file_size_bytes || 0)}</td>
+          <td>\${new Date(asset.created_at).toLocaleDateString()}</td>
+          <td>\${asset.download_count || 0}</td>
+        </tr>
+      \`).join('')}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    CR AudioViz AI, LLC • craudiovizai.com • Your Story. Our Design.
+  </div>
+  
+  <script>
+    window.onload = function() {
+      window.print()
+      setTimeout(function() { window.close() }, 1000)
+    }
+  </script>
+</body>
+</html>
+    \`)
+    
+    printWindow.document.close()
+    setIsPrinting(false)
   }
   
   const ITEMS_PER_PAGE = 24
@@ -451,7 +517,7 @@ export default function AssetManagerPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => printReport(selectedCategory ? 'category' : 'all')}
+              onClick={() => printReport()}
               disabled={isPrinting || filteredAssets.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               title="Print to Epson"
