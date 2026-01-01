@@ -10,7 +10,7 @@ import {
   FolderOpen, Upload, Search, Filter, Grid, List, Download, Eye, Trash2,
   CheckCircle2, XCircle, AlertCircle, RefreshCw, ChevronLeft, ChevronRight,
   Calendar, HardDrive, FileText, Image, Music, Video, Archive, Code,
-  SortAsc, SortDesc, MoreVertical, ExternalLink, Copy, Clock
+  SortAsc, SortDesc, MoreVertical, ExternalLink, Copy, Clock, Printer
 } from 'lucide-react'
 
 // =====================================================
@@ -139,6 +139,35 @@ export default function AssetManagerPage() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedAssets, setSelectedAssets] = useState<Set<string>>(new Set())
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null)
+  const [isPrinting, setIsPrinting] = useState(false)
+
+  // Print to Epson function
+  const printReport = async (type: 'all' | 'category') => {
+    setIsPrinting(true)
+    try {
+      const res = await fetch('/api/print', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'asset-list',
+          title: type === 'category' && selectedCategory 
+            ? categories.find(c => c.slug === selectedCategory)?.name 
+            : 'All Assets',
+          category: type === 'category' ? selectedCategory : undefined
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        alert('✅ Print job sent to Epson printer!')
+      } else {
+        alert('❌ Print failed: ' + (data.error || 'Unknown error'))
+      }
+    } catch (error) {
+      alert('❌ Print failed: Network error')
+    } finally {
+      setIsPrinting(false)
+    }
+  }
   
   const ITEMS_PER_PAGE = 24
 
@@ -420,17 +449,28 @@ export default function AssetManagerPage() {
               AI-powered asset organization • Upload anywhere, file automatically
             </p>
           </div>
-          <button
-            onClick={() => {
-              fetchCategories()
-              fetchAssets(selectedCategory || undefined)
-              fetchLandingZone()
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => printReport(selectedCategory ? 'category' : 'all')}
+              disabled={isPrinting || filteredAssets.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Print to Epson"
+            >
+              <Printer className="w-4 h-4" />
+              {isPrinting ? 'Printing...' : 'Print'}
+            </button>
+            <button
+              onClick={() => {
+                fetchCategories()
+                fetchAssets(selectedCategory || undefined)
+                fetchLandingZone()
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-6">
