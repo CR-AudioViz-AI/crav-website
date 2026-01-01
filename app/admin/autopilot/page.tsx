@@ -3,7 +3,8 @@
  * ==========================================
  * 
  * The central nervous system for autonomous operations.
- * Now wired to real /api/admin/autopilot endpoint.
+ * Implements the Autopilot Loop:
+ * Observe → Test → Score → Recommend → Fix → Verify → Report
  * 
  * @version 2.0.0
  * @date January 1, 2026
@@ -48,7 +49,7 @@ export default function AutopilotControlCenter() {
   const [autopilot, setAutopilot] = useState<AutopilotState | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [actionInProgress, setActionInProgress] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const fetchAutopilotStatus = useCallback(async () => {
     try {
@@ -61,7 +62,7 @@ export default function AutopilotControlCenter() {
         setError(data.error || 'Failed to fetch status')
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Connection error')
     } finally {
       setLoading(false)
     }
@@ -75,46 +76,29 @@ export default function AutopilotControlCenter() {
   }, [fetchAutopilotStatus])
 
   async function toggleAutopilot() {
-    setActionInProgress(true)
+    setActionLoading(true)
     try {
-      const action = autopilot?.enabled ? 'disable' : 'enable'
       const res = await fetch('/api/admin/autopilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, tier: 0 })
+        body: JSON.stringify({
+          action: autopilot?.enabled ? 'disable' : 'enable',
+          tier: autopilot?.tier ?? 0
+        })
       })
       const data = await res.json()
       if (data.success) {
         setAutopilot(data.autopilot)
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      console.error('Toggle error:', err)
     } finally {
-      setActionInProgress(false)
-    }
-  }
-
-  async function setTier(newTier: 0 | 1 | 2) {
-    setActionInProgress(true)
-    try {
-      const res = await fetch('/api/admin/autopilot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'setTier', tier: newTier })
-      })
-      const data = await res.json()
-      if (data.success) {
-        setAutopilot(data.autopilot)
-      }
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setActionInProgress(false)
+      setActionLoading(false)
     }
   }
 
   async function runAutopilotLoop() {
-    setActionInProgress(true)
+    setActionLoading(true)
     try {
       const res = await fetch('/api/admin/autopilot', {
         method: 'POST',
@@ -125,14 +109,33 @@ export default function AutopilotControlCenter() {
       if (data.success) {
         setAutopilot(data.autopilot)
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      console.error('Run error:', err)
     } finally {
-      setActionInProgress(false)
+      setActionLoading(false)
     }
   }
 
-  function getStatusColor(status: string) {
+  async function setTier(tier: 0 | 1 | 2) {
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/autopilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setTier', tier })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAutopilot(data.autopilot)
+      }
+    } catch (err) {
+      console.error('Tier error:', err)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  function getStatusColor(status: string): string {
     switch (status) {
       case 'healthy': return 'bg-green-500'
       case 'warning': return 'bg-yellow-500'
@@ -141,13 +144,10 @@ export default function AutopilotControlCenter() {
     }
   }
 
-  function getStatusBg(status: string) {
-    switch (status) {
-      case 'healthy': return 'bg-green-50 border-green-200'
-      case 'warning': return 'bg-yellow-50 border-yellow-200'
-      case 'critical': return 'bg-red-50 border-red-200'
-      default: return 'bg-gray-50 border-gray-200'
-    }
+  function getScoreColor(score: number): string {
+    if (score >= 80) return 'text-green-600'
+    if (score >= 50) return 'text-yellow-600'
+    return 'text-red-600'
   }
 
   if (loading) {
@@ -158,129 +158,130 @@ export default function AutopilotControlCenter() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h3 className="text-red-800 font-semibold">Error Loading Autopilot</h3>
+        <p className="text-red-600 mt-2">{error}</p>
+        <button 
+          onClick={fetchAutopilotStatus}
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Autopilot Control Center</h1>
-          <p className="text-gray-500 mt-1">
-            Autonomous monitoring and self-healing operations
+          <p className="text-gray-600 mt-1">
+            Autonomous platform monitoring and self-healing operations
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <button
-            onClick={runAutopilotLoop}
-            disabled={actionInProgress}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {actionInProgress ? (
-              <span className="animate-spin">⟳</span>
-            ) : (
-              <span>▶</span>
-            )}
-            Run Loop
-          </button>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+            autopilot?.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}>
+            {autopilot?.enabled ? '● ACTIVE' : '○ STANDBY'}
+          </span>
           <button
             onClick={toggleAutopilot}
-            disabled={actionInProgress}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              autopilot?.enabled
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            disabled={actionLoading}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              autopilot?.enabled 
+                ? 'bg-red-600 text-white hover:bg-red-700' 
+                : 'bg-green-600 text-white hover:bg-green-700'
             } disabled:opacity-50`}
           >
-            {autopilot?.enabled ? 'Disable Autopilot' : 'Enable Autopilot'}
+            {actionLoading ? '...' : autopilot?.enabled ? 'Disable' : 'Enable'}
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          {error}
-        </div>
-      )}
-
-      {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border p-4">
-          <div className="text-sm text-gray-500">Status</div>
-          <div className={`text-2xl font-bold ${autopilot?.enabled ? 'text-green-600' : 'text-gray-400'}`}>
-            {autopilot?.enabled ? 'ACTIVE' : 'DISABLED'}
+      {/* Score Card */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700">Overall Health Score</h2>
+            <p className="text-sm text-gray-500">
+              Last updated: {autopilot?.lastRun ? new Date(autopilot.lastRun).toLocaleString() : 'Never'}
+            </p>
           </div>
-        </div>
-        <div className="bg-white rounded-lg border p-4">
-          <div className="text-sm text-gray-500">Current Tier</div>
-          <div className="text-2xl font-bold text-blue-600">
-            Tier {autopilot?.tier ?? 0}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border p-4">
-          <div className="text-sm text-gray-500">Health Score</div>
-          <div className={`text-2xl font-bold ${
-            (autopilot?.overallScore ?? 0) >= 80 ? 'text-green-600' :
-            (autopilot?.overallScore ?? 0) >= 50 ? 'text-yellow-600' : 'text-red-600'
-          }`}>
+          <div className={`text-5xl font-bold ${getScoreColor(autopilot?.overallScore ?? 0)}`}>
             {autopilot?.overallScore ?? 0}%
           </div>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <div className="text-sm text-gray-500">Last Run</div>
-          <div className="text-lg font-medium text-gray-700">
-            {autopilot?.lastRun 
-              ? new Date(autopilot.lastRun).toLocaleTimeString()
-              : 'Never'}
-          </div>
+        <div className="mt-4 h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className={`h-full transition-all duration-500 ${
+              (autopilot?.overallScore ?? 0) >= 80 ? 'bg-green-500' :
+              (autopilot?.overallScore ?? 0) >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+            }`}
+            style={{ width: `${autopilot?.overallScore ?? 0}%` }}
+          />
         </div>
       </div>
 
       {/* Tier Selection */}
-      <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-lg font-semibold mb-4">Autonomous Operation Tier</h2>
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Autonomous Operation Tier</h2>
         <div className="grid grid-cols-3 gap-4">
-          {[0, 1, 2].map((tier) => (
+          {[
+            { tier: 0, name: 'Observe Only', desc: 'Monitor and report, no changes' },
+            { tier: 1, name: 'Safe Auto-Fix', desc: 'Restart services, clear caches' },
+            { tier: 2, name: 'Full Autonomous', desc: 'Code changes, deployments (approval required)' }
+          ].map(({ tier, name, desc }) => (
             <button
               key={tier}
               onClick={() => setTier(tier as 0 | 1 | 2)}
-              disabled={actionInProgress}
-              className={`p-4 rounded-lg border-2 text-left transition-all ${
-                autopilot?.tier === tier
-                  ? 'border-blue-500 bg-blue-50'
+              disabled={actionLoading}
+              className={`p-4 rounded-lg border-2 text-left transition ${
+                autopilot?.tier === tier 
+                  ? 'border-blue-500 bg-blue-50' 
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <div className="font-semibold">Tier {tier}</div>
-              <div className="text-sm text-gray-500 mt-1">
-                {tier === 0 && 'Observe Only - Read-only monitoring'}
-                {tier === 1 && 'Safe Auto-Fix - Restart services, clear caches'}
-                {tier === 2 && 'Full Auto - Code changes, deployments (approval required)'}
-              </div>
+              <div className="font-semibold text-gray-900">Tier {tier}: {name}</div>
+              <div className="text-sm text-gray-500 mt-1">{desc}</div>
             </button>
           ))}
         </div>
       </div>
 
       {/* System Health */}
-      <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-lg font-semibold mb-4">System Health</h2>
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-700">System Health</h2>
+          <button
+            onClick={runAutopilotLoop}
+            disabled={actionLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {actionLoading ? 'Running...' : 'Run Health Check'}
+          </button>
+        </div>
         <div className="space-y-3">
           {autopilot?.systemHealth.map((system, index) => (
-            <div
-              key={index}
-              className={`flex items-center justify-between p-4 rounded-lg border ${getStatusBg(system.status)}`}
-            >
+            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(system.status)}`}></div>
+                <div className={`w-3 h-3 rounded-full ${getStatusColor(system.status)}`} />
                 <div>
-                  <div className="font-medium">{system.name}</div>
+                  <div className="font-medium text-gray-900">{system.name}</div>
                   <div className="text-sm text-gray-500">{system.details}</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-semibold">{system.score}%</div>
-                <div className="text-xs text-gray-500">
+              <div className="flex items-center gap-4">
+                <span className={`font-semibold ${getScoreColor(system.score)}`}>
+                  {system.score}%
+                </span>
+                <span className="text-xs text-gray-400">
                   {new Date(system.lastCheck).toLocaleTimeString()}
-                </div>
+                </span>
               </div>
             </div>
           ))}
@@ -289,28 +290,21 @@ export default function AutopilotControlCenter() {
 
       {/* Pending Actions */}
       {autopilot?.pendingActions && autopilot.pendingActions.length > 0 && (
-        <div className="bg-white rounded-lg border p-6">
-          <h2 className="text-lg font-semibold mb-4">Pending Actions</h2>
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Pending Actions</h2>
           <div className="space-y-3">
             {autopilot.pendingActions.map((action) => (
-              <div
-                key={action.id}
-                className="flex items-center justify-between p-4 rounded-lg border bg-yellow-50 border-yellow-200"
-              >
+              <div key={action.id} className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                 <div>
-                  <div className="font-medium">{action.target}</div>
+                  <div className="font-medium text-gray-900">{action.target}</div>
                   <div className="text-sm text-gray-600">{action.description}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    action.status === 'needs_approval' 
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {action.status}
-                  </span>
-                  <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                  <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-medium">
                     Tier {action.tier}
+                  </span>
+                  <span className="px-2 py-1 bg-gray-200 text-gray-800 rounded text-xs font-medium">
+                    {action.status}
                   </span>
                 </div>
               </div>
@@ -319,23 +313,19 @@ export default function AutopilotControlCenter() {
         </div>
       )}
 
-      {/* Autopilot Loop Visualization */}
-      <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-lg font-semibold mb-4">Autopilot Loop</h2>
-        <div className="flex items-center justify-between">
-          {['Observe', 'Test', 'Score', 'Recommend', 'Fix', 'Verify', 'Report'].map((step, index) => (
+      {/* Loop Diagram */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border p-6">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Autopilot Loop</h2>
+        <div className="flex items-center justify-between text-center">
+          {['Observe', 'Test', 'Score', 'Recommend', 'Fix', 'Verify', 'Report'].map((step, i) => (
             <div key={step} className="flex items-center">
               <div className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${
-                  index === 0 ? 'bg-blue-600' : 'bg-gray-300'
-                }`}>
-                  {index + 1}
+                <div className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center font-bold text-blue-600">
+                  {i + 1}
                 </div>
-                <div className="text-xs mt-1 text-gray-600">{step}</div>
+                <span className="text-sm font-medium text-gray-700 mt-2">{step}</span>
               </div>
-              {index < 6 && (
-                <div className="w-8 h-0.5 bg-gray-300 mx-1"></div>
-              )}
+              {i < 6 && <div className="w-8 h-0.5 bg-blue-300 mx-2" />}
             </div>
           ))}
         </div>
