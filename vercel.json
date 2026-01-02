@@ -16,7 +16,8 @@
   "crons": [
     {"path": "/api/cron/process-knowledge", "schedule": "*/5 * * * *"},
     {"path": "/api/cron/warmup", "schedule": "*/3 * * * *"},
-    {"path": "/api/cron/autopilot", "schedule": "*/5 * * * *"}
+    {"path": "/api/cron/autopilot", "schedule": "*/5 * * * *"},
+    {"path": "/api/cron/email-automation", "schedule": "*/15 * * * *"}
   ],
   "headers": [
     {"source": "/api/(.*)", "headers": [{"key": "Cache-Control", "value": "s-maxage=0, stale-while-revalidate=59"}]}
