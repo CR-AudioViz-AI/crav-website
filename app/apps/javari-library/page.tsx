@@ -297,11 +297,11 @@ export default function JavariLibraryPage() {
         <div className="flex gap-3 overflow-x-auto pb-4 mb-8 scrollbar-hide">
           <button
             onClick={() => setSelectedCategory(null)}
-            className={\`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition \${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition ${
               !selectedCategory 
                 ? 'bg-purple-600 text-white' 
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }\`}
+            }`}
           >
             <Sparkles className="w-4 h-4" />
             All Books
@@ -310,11 +310,11 @@ export default function JavariLibraryPage() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={\`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition \${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition ${
                 selectedCategory === cat.id 
                   ? 'bg-purple-600 text-white' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }\`}
+              }`}
             >
               <span>{cat.icon}</span>
               {cat.name}
@@ -333,20 +333,20 @@ export default function JavariLibraryPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={\`p-2 rounded-lg \${viewMode === 'grid' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}\`}
+                className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={\`p-2 rounded-lg \${viewMode === 'list' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}\`}
+                className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}`}
               >
                 <List className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          <div className={\`grid gap-6 \${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}\`}>
+          <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
             {featuredBooks.map(book => (
               <div 
                 key={book.id}
@@ -392,11 +392,11 @@ export default function JavariLibraryPage() {
                     </button>
                     <button 
                       onClick={() => toggleWishlist(book.id)}
-                      className={\`p-3 rounded-xl transition \${
+                      className={`p-3 rounded-xl transition ${
                         wishlist.includes(book.id) ? 'bg-pink-500' : 'bg-white/20 hover:bg-white/30'
-                      }\`}
+                      }`}
                     >
-                      <Heart className={\`w-6 h-6 \${wishlist.includes(book.id) ? 'text-white fill-white' : 'text-white'}\`} />
+                      <Heart className={`w-6 h-6 ${wishlist.includes(book.id) ? 'text-white fill-white' : 'text-white'}`} />
                     </button>
                   </div>
                 </div>
@@ -537,11 +537,11 @@ export default function JavariLibraryPage() {
                 {SUBSCRIPTION_PLANS.map(plan => (
                   <div 
                     key={plan.id}
-                    className={\`rounded-xl p-6 border-2 transition \${
+                    className={`rounded-xl p-6 border-2 transition ${
                       plan.popular 
                         ? 'border-purple-500 bg-purple-500/10' 
                         : 'border-gray-700 bg-gray-800/50'
-                    }\`}
+                    }`}
                   >
                     {plan.popular && (
                       <span className="inline-block px-3 py-1 bg-purple-500 text-white text-xs font-bold rounded-full mb-4">
@@ -576,13 +576,13 @@ export default function JavariLibraryPage() {
                     </ul>
 
                     <button 
-                      className={\`w-full py-3 rounded-xl font-semibold transition \${
+                      className={`w-full py-3 rounded-xl font-semibold transition ${
                         plan.id === 'free'
                           ? 'bg-gray-700 text-gray-400 cursor-default'
                           : plan.popular
                             ? 'bg-purple-600 text-white hover:bg-purple-700'
                             : 'bg-gray-700 text-white hover:bg-gray-600'
-                      }\`}
+                      }`}
                     >
                       {plan.cta}
                     </button>
