@@ -1,8 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-import { getErrorMessage, logError, formatApiError } from '@/lib/utils/error-utils';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
+  const startTime = Date.now();
+  
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,19 +21,24 @@ export async function GET() {
 
     const checks = {
       timestamp: new Date().toISOString(),
-      status: 'healthy',
+      status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
+      responseTime: 0,
       services: {
         supabase: false,
         legalease_table: false,
-        authentication: false
+        authentication: false,
+        profiles: false
       },
       database: {
-        legalease_table: false,
-        connection: false
+        connection: false,
+        tables: {
+          profiles: false,
+          legalease_documents: false
+        }
       }
     }
 
-    // Check Supabase connection
+    // Check Supabase connection via profiles table
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -38,7 +47,9 @@ export async function GET() {
       
       if (!error) {
         checks.services.supabase = true
+        checks.services.profiles = true
         checks.database.connection = true
+        checks.database.tables.profiles = true
       }
     } catch (err: unknown) {
       console.error('Supabase connection check failed:', err)
@@ -51,48 +62,64 @@ export async function GET() {
         .select('id')
         .limit(1)
       
-      if (!error || error.message.includes('Results contain 0 rows')) {
+      if (!error) {
         checks.services.legalease_table = true
-        checks.database.legalease_table = true
-      } else if (error.code === '42P01') {
-        // Table doesn't exist - this is expected before migration
-        checks.services.legalease_table = false
-        checks.database.legalease_table = false
+        checks.database.tables.legalease_documents = true
+      } else {
+        console.error('Legalease check error:', error.message)
       }
-    } catch (err: any) {
-      checks.services.legalease_table = false
-      checks.database.legalease_table = false
+    } catch (err: unknown) {
+      console.error('Legalease table check failed:', err)
     }
 
-    // Check auth
+    // Check auth service
     try {
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (!error || error.message.includes('session')) {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      // Even without a session, if no error then auth service is up
+      if (!error) {
         checks.services.authentication = true
       }
     } catch (err: unknown) {
-      // Auth check from server may fail, that's OK
-      checks.services.authentication = true
+      console.error('Auth check failed:', err)
     }
 
-    // Overall status
-    if (checks.services.supabase && checks.database.connection) {
-      if (checks.database.legalease_table) {
+    // Calculate response time
+    checks.responseTime = Date.now() - startTime;
+
+    // Determine overall status
+    const criticalServices = [checks.services.supabase, checks.database.connection]
+    const allServices = Object.values(checks.services)
+    
+    if (criticalServices.every(s => s)) {
+      if (allServices.every(s => s)) {
         checks.status = 'healthy'
       } else {
-        checks.status = 'degraded' // Works but missing optional table
+        checks.status = 'degraded'
       }
     } else {
       checks.status = 'unhealthy'
     }
 
-    return NextResponse.json(checks)
-
-  } catch (error: any) {
+    return NextResponse.json(checks, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
+      }
+    })
+  } catch (error) {
+    console.error('Health check error:', error)
     return NextResponse.json({
-      status: 'error',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    }, { status: 500 })
+      timestamp: new Date().toISOString(),
+      status: 'unhealthy',
+      responseTime: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { 
+      status: 500,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate'
+      }
+    })
   }
 }
