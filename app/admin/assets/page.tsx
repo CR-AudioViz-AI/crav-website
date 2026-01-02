@@ -164,11 +164,11 @@ export default function AssetManagerPage() {
       return
     }
     
-    printWindow.document.write(\`
+    printWindow.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
-  <title>\${categoryName} - Asset Report</title>
+  <title>${categoryName} - Asset Report</title>
   <style>
     body { font-family: Arial, sans-serif; font-size: 11px; margin: 20px; color: #333; }
     h1 { font-size: 18px; color: #7c3aed; margin-bottom: 5px; }
@@ -184,12 +184,12 @@ export default function AssetManagerPage() {
   </style>
 </head>
 <body>
-  <h1>✨ \${categoryName}</h1>
-  <div class="subtitle">CR AudioViz AI Asset Manager • Generated: \${now} EST</div>
+  <h1>✨ ${categoryName}</h1>
+  <div class="subtitle">CR AudioViz AI Asset Manager • Generated: ${now} EST</div>
   
   <div class="stats">
-    <span><strong>Total Assets:</strong> \${filteredAssets.length}</span>
-    <span><strong>Total Size:</strong> \${formatBytes(totalSize)}</span>
+    <span><strong>Total Assets:</strong> ${filteredAssets.length}</span>
+    <span><strong>Total Size:</strong> ${formatBytes(totalSize)}</span>
   </div>
 
   <table>
@@ -204,16 +204,16 @@ export default function AssetManagerPage() {
       </tr>
     </thead>
     <tbody>
-      \${filteredAssets.map((asset, i) => \`
+      ${filteredAssets.map((asset, i) => `
         <tr>
-          <td>\${i + 1}</td>
-          <td>\${asset.name || asset.original_filename}</td>
-          <td>\${(asset.file_extension || '').toUpperCase()}</td>
-          <td>\${formatBytes(asset.file_size_bytes || 0)}</td>
-          <td>\${new Date(asset.created_at).toLocaleDateString()}</td>
-          <td>\${asset.download_count || 0}</td>
+          <td>${i + 1}</td>
+          <td>${asset.name || asset.original_filename}</td>
+          <td>${(asset.file_extension || '').toUpperCase()}</td>
+          <td>${formatBytes(asset.file_size_bytes || 0)}</td>
+          <td>${new Date(asset.created_at).toLocaleDateString()}</td>
+          <td>${asset.download_count || 0}</td>
         </tr>
-      \`).join('')}
+      `).join('')}
     </tbody>
   </table>
 
@@ -229,7 +229,7 @@ export default function AssetManagerPage() {
   </script>
 </body>
 </html>
-    \`)
+    `)
     
     printWindow.document.close()
     setIsPrinting(false)
