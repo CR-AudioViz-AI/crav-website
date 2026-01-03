@@ -1,7 +1,8 @@
 // /app/api/user/assets/route.ts
 // Fetch user's personal assets from the library
-// Timestamp: January 3, 2026 - 3:57 PM EST
+// Timestamp: January 3, 2026 - 4:30 PM EST
 // CR AudioViz AI - Henderson Standard
+// Uses owned_by field (existing column) for user ownership
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Build query
+    // Build query - use owned_by OR uploaded_by (existing columns)
     let query = supabase
       .from('assets')
       .select('*')
@@ -80,9 +81,9 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .range(offset, offset + limit - 1)
 
-    // Filter by user (admins can see all for testing)
+    // Filter by user ownership
     if (!isAdmin) {
-      query = query.or(`user_id.eq.${userId},owned_by.eq.${userId},uploaded_by.eq.${userId}`)
+      query = query.or(`owned_by.eq.${userId},uploaded_by.eq.${userId}`)
     }
 
     // Filter by type
@@ -100,8 +101,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Only show user-generated content (has user_id set)
-    query = query.not('user_id', 'is', null)
+    // For non-admins, only show assets they own
+    if (!isAdmin) {
+      // The or() clause above already handles this
+    }
 
     const { data: assets, error: fetchError } = await query
 
@@ -117,10 +120,9 @@ export async function GET(request: NextRequest) {
     let countQuery = supabase
       .from('assets')
       .select('id', { count: 'exact', head: true })
-      .not('user_id', 'is', null)
 
     if (!isAdmin) {
-      countQuery = countQuery.or(`user_id.eq.${userId},owned_by.eq.${userId},uploaded_by.eq.${userId}`)
+      countQuery = countQuery.or(`owned_by.eq.${userId},uploaded_by.eq.${userId}`)
     }
 
     const { count } = await countQuery
@@ -186,11 +188,11 @@ export async function DELETE(request: NextRequest) {
     if (!isAdmin) {
       const { data: asset } = await supabase
         .from('assets')
-        .select('user_id, owned_by')
+        .select('owned_by, uploaded_by')
         .eq('id', assetId)
         .single()
 
-      if (!asset || (asset.user_id !== user.id && asset.owned_by !== user.id)) {
+      if (!asset || (asset.owned_by !== user.id && asset.uploaded_by !== user.id)) {
         return NextResponse.json(
           { error: 'Asset not found or access denied' },
           { status: 403 }
@@ -202,7 +204,7 @@ export async function DELETE(request: NextRequest) {
     const { error: deleteError } = await supabase
       .from('assets')
       .update({ 
-        user_id: null,
+        owned_by: null,
         status: 'archived',
         archived_at: new Date().toISOString()
       })
