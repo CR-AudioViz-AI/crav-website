@@ -277,6 +277,8 @@ export default function DashboardPage() {
   ]);
 
   const quickActions: QuickAction[] = [
+    { id: 'library', name: 'My Library', icon: '📚', url: '/dashboard/library', color: 'bg-gradient-to-br from-purple-500 to-indigo-500' },
+    { id: 'books', name: 'Create Audiobook', icon: '🎧', url: '/apps/javari-books', color: 'bg-gradient-to-br from-violet-500 to-purple-500' },
     { id: 'chat', name: 'Chat with Javari', icon: '💬', url: '/chat', color: 'bg-gradient-to-br from-blue-500 to-purple-500' },
     { id: 'logo', name: 'Create Logo', icon: '🎨', url: '/tools/logo-creator', color: 'bg-gradient-to-br from-pink-500 to-rose-500' },
     { id: 'document', name: 'Write Document', icon: '📄', url: '/tools/document-writer', color: 'bg-gradient-to-br from-green-500 to-emerald-500' },
