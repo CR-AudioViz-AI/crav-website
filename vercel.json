@@ -11,13 +11,18 @@
     "app/api/cron/**/*.ts": {"memory": 1024, "maxDuration": 300},
     "app/api/admin/**/*.ts": {"memory": 1024, "maxDuration": 60},
     "app/api/chat/**/*.ts": {"memory": 2048, "maxDuration": 120},
-    "app/api/ai/**/*.ts": {"memory": 2048, "maxDuration": 120}
+    "app/api/ai/**/*.ts": {"memory": 2048, "maxDuration": 120},
+    "app/api/javari/**/*.ts": {"memory": 2048, "maxDuration": 120}
   },
   "crons": [
     {"path": "/api/cron/warmup", "schedule": "*/2 * * * *"},
-    {"path": "/api/cron/process-knowledge", "schedule": "*/5 * * * *"},
-    {"path": "/api/cron/autopilot", "schedule": "*/5 * * * *"},
-    {"path": "/api/cron/email-automation", "schedule": "*/15 * * * *"}
+    {"path": "/api/cron/orchestrator", "schedule": "*/5 * * * *"},
+    {"path": "/api/cron/autopilot", "schedule": "*/10 * * * *"},
+    {"path": "/api/cron/autofix", "schedule": "*/15 * * * *"},
+    {"path": "/api/cron/process-knowledge", "schedule": "*/30 * * * *"},
+    {"path": "/api/cron/email-automation", "schedule": "0 * * * *"},
+    {"path": "/api/cron/health-check", "schedule": "*/3 * * * *"},
+    {"path": "/api/cron/ecosystem-monitor", "schedule": "0 */4 * * *"}
   ],
   "headers": [
     {
@@ -28,6 +33,7 @@
         {"key": "X-XSS-Protection", "value": "1; mode=block"},
         {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
         {"key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()"},
+        {"key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains"},
         {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://js.stripe.com https://www.paypal.com https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.paypal.com https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com wss://*.supabase.co; frame-src https://js.stripe.com https://www.paypal.com https://www.youtube.com; object-src 'none'; base-uri 'self';"}
       ]
     },
