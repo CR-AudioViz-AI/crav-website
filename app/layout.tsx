@@ -1,17 +1,9 @@
 /**
  * CR AudioViz AI - Root Layout
  * 
- * Complete page structure with:
- * - Header
- * - CR= Bar
- * - Credits Bar
- * - Main content
- * - Social Media Buttons (above footer)
- * - Footer
- * - Javari Widget
- * - CanonicalLink (SEO)
+ * Complete page structure with canonical URLs for SEO
  * 
- * @timestamp Friday, January 02, 2026 - 7:52 PM EST
+ * @timestamp Friday, January 02, 2026 - 8:04 PM EST
  * @author Claude (for Roy Henderson)
  */
 
@@ -29,10 +21,6 @@ import { CanonicalLink } from '@/components/seo/canonical-link';
 
 const inter = Inter({ subsets: ["latin"] });
 
-/**
- * Viewport configuration for mobile-first design
- * CRITICAL: Prevents iOS zoom, enables proper mobile scaling
- */
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -51,6 +39,9 @@ export const metadata: Metadata = {
   keywords: "AI tools, app builder, game creator, website builder, Javari AI, no-code platform, creative tools, CR AudioViz AI",
   authors: [{ name: "CR AudioViz AI, LLC" }],
   manifest: '/manifest.json',
+  alternates: {
+    canonical: 'https://craudiovizai.com',
+  },
   robots: {
     index: true,
     follow: true,
