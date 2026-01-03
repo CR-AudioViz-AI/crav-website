@@ -1,3 +1,23 @@
+
+// ============================================================================
+// ADMIN BYPASS - Roy & Cindy Henderson get FREE access to EVERYTHING
+// ============================================================================
+
+export const ADMIN_EMAILS: string[] = [
+  'royhenderson@craudiovizai.com',
+  'cindyhenderson@craudiovizai.com'
+]
+
+export function isAdmin(email: string | null | undefined): boolean {
+  if (!email) return false
+  return ADMIN_EMAILS.includes(email.toLowerCase())
+}
+
+export function shouldChargeCredits(email: string | null | undefined): boolean {
+  return !isAdmin(email)
+}
+
+
 /**
  * CR AudioViz AI - Central Services Client
  * =========================================
