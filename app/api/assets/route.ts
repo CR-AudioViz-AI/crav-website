@@ -1,147 +1,267 @@
-// Universal Asset Registry API
-// Timestamp: January 1, 2026 - 4:50 AM EST
-// CR AudioViz AI - Central asset access for all apps
+// ================================================================================
+// UNIVERSAL ASSETS API - /api/assets
+// Single source of truth for all asset operations
+// ================================================================================
 
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs';
 
-/**
- * Universal Asset Registry API
- * 
- * GET /api/assets
- *   ?category=ebooks         - Filter by category slug
- *   ?search=whiskey          - Search by name/filename
- *   ?type=docx               - Filter by file extension
- *   ?limit=50                - Limit results (default 100)
- *   ?offset=0                - Pagination offset
- *   ?sort=created_at         - Sort field
- *   &order=desc              - Sort order
- * 
- * Response:
- * {
- *   success: true,
- *   data: Asset[],
- *   meta: {
- *     total: number,
- *     limit: number,
- *     offset: number,
- *     category?: string
- *   }
- * }
- */
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+};
 
-export async function GET(request: Request) {
-  try {
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-    
-    const { searchParams } = new URL(request.url)
-    
-    const category = searchParams.get('category')
-    const search = searchParams.get('search')
-    const type = searchParams.get('type')
-    const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
-    const offset = parseInt(searchParams.get('offset') || '0')
-    const sort = searchParams.get('sort') || 'created_at'
-    const order = searchParams.get('order') || 'desc'
-    
-    // Build query
-    let query = supabase
+const generateRequestId = () => `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+// Generate asset_id: AST-{TYPE}-{YEAR}-{SEQ}
+const generateAssetId = (type: string) => {
+  const typeMap: Record<string, string> = {
+    'image': 'IMG', 'audio': 'AUD', 'video': 'VID', 'document': 'DOC',
+    'ebook': 'EBK', 'font': 'FNT', 'model_3d': 'M3D', 'sprite': 'SPR',
+    'template': 'TPL', 'spirit': 'SPI', 'cocktail': 'CTL', 'other': 'OTH'
+  };
+  const code = typeMap[type] || 'OTH';
+  const year = new Date().getFullYear();
+  const seq = Math.floor(Math.random() * 999999).toString().padStart(6, '0');
+  return `AST-${code}-${year}-${seq}`;
+};
+
+// GET - List or search assets
+export async function GET(request: NextRequest) {
+  const requestId = generateRequestId();
+  const supabase = getSupabase();
+  if (!supabase) return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+  
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  const search = searchParams.get('search');
+  const type = searchParams.get('type');
+  const category = searchParams.get('category');
+  const source = searchParams.get('source');
+  const owner = searchParams.get('owner');
+  const license = searchParams.get('license');
+  const limit = parseInt(searchParams.get('limit') || '50');
+  const offset = parseInt(searchParams.get('offset') || '0');
+  
+  // Get single asset by ID
+  if (id) {
+    const { data, error } = await supabase
       .from('assets')
-      .select(`
-        id, name, slug, original_filename, file_size_bytes, mime_type,
-        file_extension, storage_path, category_id, status, created_at,
-        updated_at, download_count, view_count, is_public, is_free, tags,
-        asset_categories!inner(slug, name, storage_folder)
-      `, { count: 'exact' })
-      .eq('status', 'active')
-    
-    // Category filter
-    if (category) {
-      query = query.eq('asset_categories.slug', category)
-    }
-    
-    // Search filter
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,original_filename.ilike.%${search}%`)
-    }
-    
-    // Type filter
-    if (type) {
-      query = query.eq('file_extension', type.toLowerCase())
-    }
-    
-    // Sorting
-    const validSorts = ['created_at', 'updated_at', 'name', 'file_size_bytes', 'download_count']
-    if (validSorts.includes(sort)) {
-      query = query.order(sort, { ascending: order === 'asc' })
-    }
-    
-    // Pagination
-    query = query.range(offset, offset + limit - 1)
-    
-    const { data, error, count } = await query
+      .select('*, asset_categories(name, slug)')
+      .eq('id', id)
+      .single();
     
     if (error) {
-      return NextResponse.json({
-        success: false,
-        error: error.message
-      }, { status: 500 })
+      return NextResponse.json({ error: error.message, request_id: requestId }, { status: 404 });
     }
     
-    // Format response
-    const assets = data?.map(asset => ({
-      id: asset.id,
-      name: asset.name,
-      slug: asset.slug,
-      filename: asset.original_filename,
-      size: asset.file_size_bytes,
-      sizeFormatted: formatBytes(asset.file_size_bytes),
-      mimeType: asset.mime_type,
-      extension: asset.file_extension,
-      path: asset.storage_path,
-      category: {
-        slug: asset.asset_categories?.slug,
-        name: asset.asset_categories?.name,
-        folder: asset.asset_categories?.storage_folder
+    return NextResponse.json({
+      request_id: requestId,
+      asset: data,
+    });
+  }
+  
+  // Build query
+  let query = supabase
+    .from('assets')
+    .select('*, asset_categories(name, slug)', { count: 'exact' });
+  
+  // Apply filters
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,tags.cs.{${search}}`);
+  }
+  if (type) {
+    query = query.eq('mime_type', type);
+  }
+  if (category) {
+    query = query.eq('category_id', category);
+  }
+  if (owner) {
+    query = query.eq('owned_by', owner);
+  }
+  if (license) {
+    query = query.contains('metadata', { license_type: license });
+  }
+  
+  // Apply status filter
+  query = query.eq('status', 'active');
+  
+  // Apply pagination
+  query = query.range(offset, offset + limit - 1).order('created_at', { ascending: false });
+  
+  const { data, error, count } = await query;
+  
+  if (error) {
+    return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
+  }
+  
+  return NextResponse.json({
+    request_id: requestId,
+    assets: data || [],
+    count: data?.length || 0,
+    total: count || 0,
+    offset,
+    limit,
+  });
+}
+
+// POST - Upload/create asset
+export async function POST(request: NextRequest) {
+  const requestId = generateRequestId();
+  const supabase = getSupabase();
+  if (!supabase) return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+  
+  try {
+    const body = await request.json();
+    const {
+      name,
+      description,
+      asset_type = 'other',
+      category_id,
+      license_type = 'proprietary',
+      source_url,
+      source_name,
+      tags = [],
+      metadata = {},
+      owner_id,
+      tenant_id,
+    } = body;
+    
+    if (!name) {
+      return NextResponse.json({ error: 'Name required', request_id: requestId }, { status: 400 });
+    }
+    
+    // Generate slug
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 100);
+    
+    // Build asset record
+    const assetData: any = {
+      name,
+      slug: `${slug}-${Date.now()}`,
+      description,
+      tags,
+      owned_by: owner_id,
+      status: 'active',
+      is_public: true,
+      is_free: license_type === 'CC0' || license_type === 'MIT',
+      metadata: {
+        ...metadata,
+        asset_id: generateAssetId(asset_type),
+        license_type,
+        source_url,
+        source_name,
+        tenant_id,
+        commercial_use_ok: ['CC0', 'MIT', 'Apache-2.0'].includes(license_type),
+        attribution_required: ['CC-BY', 'CC-BY-SA', 'CC-BY-NC'].includes(license_type),
       },
-      isPublic: asset.is_public,
-      isFree: asset.is_free,
-      downloads: asset.download_count || 0,
-      views: asset.view_count || 0,
-      tags: asset.tags || [],
-      createdAt: asset.created_at,
-      updatedAt: asset.updated_at
-    })) || []
+    };
+    
+    if (category_id) {
+      assetData.category_id = category_id;
+    }
+    
+    const { data, error } = await supabase
+      .from('assets')
+      .insert(assetData)
+      .select()
+      .single();
+    
+    if (error) {
+      return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
+    }
+    
+    // Store evidence artifact
+    await supabase.from('evidence_artifacts').insert({
+      artifact_type: 'asset_created',
+      domain: 'craudiovizai.com',
+      file_path: `assets/${data.id}`,
+      metadata: {
+        asset_id: data.metadata?.asset_id,
+        name,
+        license_type,
+        source_name,
+      },
+    });
     
     return NextResponse.json({
-      success: true,
-      data: assets,
-      meta: {
-        total: count || 0,
-        limit,
-        offset,
-        category: category || undefined,
-        search: search || undefined
-      }
-    })
+      request_id: requestId,
+      asset: data,
+      asset_id: data.metadata?.asset_id,
+    });
     
-  } catch (error) {
-    console.error('Asset registry error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error'
-    }, { status: 500 })
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
   }
 }
 
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+// PUT - Update asset
+export async function PUT(request: NextRequest) {
+  const requestId = generateRequestId();
+  const supabase = getSupabase();
+  if (!supabase) return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+  
+  try {
+    const body = await request.json();
+    const { id, ...updates } = body;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'ID required', request_id: requestId }, { status: 400 });
+    }
+    
+    const { data, error } = await supabase
+      .from('assets')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
+    }
+    
+    return NextResponse.json({
+      request_id: requestId,
+      asset: data,
+      updated: true,
+    });
+    
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
+  }
+}
+
+// DELETE - Archive asset
+export async function DELETE(request: NextRequest) {
+  const requestId = generateRequestId();
+  const supabase = getSupabase();
+  if (!supabase) return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+  
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  
+  if (!id) {
+    return NextResponse.json({ error: 'ID required', request_id: requestId }, { status: 400 });
+  }
+  
+  // Soft delete (archive)
+  const { data, error } = await supabase
+    .from('assets')
+    .update({ status: 'archived', archived_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) {
+    return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
+  }
+  
+  return NextResponse.json({
+    request_id: requestId,
+    asset_id: id,
+    archived: true,
+  });
 }
