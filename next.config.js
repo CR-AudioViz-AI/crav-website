@@ -66,7 +66,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://js.stripe.com https://www.paypal.com https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.paypal.com https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com wss://*.supabase.co; frame-src https://js.stripe.com https://www.paypal.com https://www.youtube.com; object-src 'none'; base-uri 'self';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://js.stripe.com https://www.paypal.com https://www.google-analytics.com https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.paypal.com https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://cloudflareinsights.com wss://*.supabase.co; frame-src https://js.stripe.com https://www.paypal.com https://www.youtube.com; object-src 'none'; base-uri 'self';",
           },
         ],
       },
