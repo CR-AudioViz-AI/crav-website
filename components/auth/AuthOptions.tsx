@@ -7,19 +7,19 @@
  * Renders ALL enabled providers from lib/auth/providers.ts configuration.
  * 
  * Features:
- * - OAuth providers (Google, GitHub, Apple, Microsoft, Discord, etc.)
+ * - OAuth providers (Google, GitHub, Apple, Microsoft, Discord, Twitter, Facebook, LinkedIn)
  * - Email + password login/signup
  * - Magic link authentication
- * - Phone/SMS authentication (when enabled)
- * - Enterprise SSO (when enabled)
+ * - Phone/SMS authentication
+ * - Enterprise SSO
  * - Forgot password link
  * - Error states for misconfigured providers
  * 
- * @timestamp January 7, 2026 - 11:30 AM EST
+ * @timestamp January 7, 2026 - 11:44 AM EST
  * @author Claude (for Roy Henderson)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { 
@@ -28,7 +28,7 @@ import {
   AUTH_FEATURES,
   AuthProviderConfig 
 } from '@/lib/auth/providers';
-import { Loader2, Mail, Sparkles, Phone, Building2, AlertCircle } from 'lucide-react';
+import { Loader2, Mail, Sparkles, Phone, Building2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 // ============================================================================
 // TYPES
@@ -115,6 +115,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   
   // UI state
   const [loading, setLoading] = useState<string | null>(null);
@@ -122,11 +123,21 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
   const [success, setSuccess] = useState('');
   const [showMagicLink, setShowMagicLink] = useState(false);
   const [showPhoneAuth, setShowPhoneAuth] = useState(false);
+  const [awaitingOtp, setAwaitingOtp] = useState(false);
   const [providerErrors, setProviderErrors] = useState<ProviderError[]>([]);
   
   // Get auth methods from config
   const authMethods = getAllAuthMethods();
   const oauthProviders = getEnabledOAuthProviders();
+  
+  // Reset to main view
+  const resetView = () => {
+    setShowMagicLink(false);
+    setShowPhoneAuth(false);
+    setAwaitingOtp(false);
+    setError('');
+    setSuccess('');
+  };
   
   // ============================================================================
   // OAUTH HANDLER
@@ -150,7 +161,6 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
       });
       
       if (authError) {
-        // Check if it's a configuration error
         if (authError.message.includes('not enabled') || authError.message.includes('not configured')) {
           setProviderErrors(prev => [...prev, { 
             providerId: provider.id, 
@@ -159,8 +169,6 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
         }
         throw authError;
       }
-      
-      // OAuth redirects, so we don't need to do anything here
     } catch (err: any) {
       console.error(`OAuth error (${provider.name}):`, err);
       setError(err.message || `Failed to sign in with ${provider.name}`);
@@ -181,7 +189,6 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
     
     try {
       if (mode === 'signup') {
-        // Signup
         if (password.length < 8) {
           throw new Error('Password must be at least 8 characters');
         }
@@ -200,7 +207,6 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
         setSuccess('Check your email to confirm your account!');
         onSuccess?.();
       } else {
-        // Login
         const { data, error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -251,6 +257,58 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
   };
   
   // ============================================================================
+  // PHONE AUTH HANDLER
+  // ============================================================================
+  
+  const handlePhoneSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading('phone');
+    setError('');
+    
+    try {
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        phone: phoneNumber,
+      });
+      
+      if (authError) throw authError;
+      
+      setAwaitingOtp(true);
+      setSuccess('Check your phone for the verification code!');
+    } catch (err: any) {
+      console.error('Phone auth error:', err);
+      setError(err.message || 'Failed to send verification code');
+      onError?.(err.message);
+    } finally {
+      setLoading(null);
+    }
+  };
+  
+  const handlePhoneVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading('phone_verify');
+    setError('');
+    
+    try {
+      const { error: authError } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: otpCode,
+        type: 'sms',
+      });
+      
+      if (authError) throw authError;
+      
+      window.location.href = redirectTo || '/dashboard';
+      onSuccess?.();
+    } catch (err: any) {
+      console.error('OTP verification error:', err);
+      setError(err.message || 'Invalid verification code');
+      onError?.(err.message);
+    } finally {
+      setLoading(null);
+    }
+  };
+  
+  // ============================================================================
   // RENDER OAUTH BUTTON
   // ============================================================================
   
@@ -280,7 +338,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
         key={provider.id}
         onClick={() => handleOAuth(provider)}
         disabled={isLoading || loading !== null}
-        className={`w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${provider.colors.bg} ${provider.colors.bgHover} ${provider.colors.border ? provider.colors.border : ''}`}
+        className={`w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${provider.colors.bg} ${provider.colors.bgHover} ${provider.colors.border || 'border-transparent'}`}
         data-testid={`auth-provider-${provider.id}`}
       >
         {isLoading ? (
@@ -316,39 +374,162 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
         </div>
       )}
       
-      {/* OAuth Providers */}
-      {oauthProviders.length > 0 && (
-        <div className="space-y-3" data-testid="oauth-providers">
-          {oauthProviders.map(renderOAuthButton)}
-        </div>
-      )}
-      
-      {/* Divider */}
-      {oauthProviders.length > 0 && authMethods.email && (
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">
-              or continue with email
-            </span>
-          </div>
-        </div>
-      )}
-      
-      {/* Magic Link Toggle */}
-      {authMethods.magicLink && !showMagicLink && !showPhoneAuth && (
+      {/* Back Button for alternate views */}
+      {(showMagicLink || showPhoneAuth) && (
         <button
-          onClick={() => setShowMagicLink(true)}
-          className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400"
-          data-testid="toggle-magic-link"
+          onClick={resetView}
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          ✨ Sign in with magic link (no password needed)
+          <ArrowLeft className="w-4 h-4" />
+          Back to all options
         </button>
       )}
       
-      {/* Magic Link Form */}
+      {/* ==================== MAIN VIEW ==================== */}
+      {!showMagicLink && !showPhoneAuth && (
+        <>
+          {/* OAuth Providers */}
+          {oauthProviders.length > 0 && (
+            <div className="space-y-3" data-testid="oauth-providers">
+              {oauthProviders.map(renderOAuthButton)}
+            </div>
+          )}
+          
+          {/* Divider */}
+          {oauthProviders.length > 0 && authMethods.email && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">
+                  or continue with email
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {/* Email/Password Form */}
+          {authMethods.email && (
+            <form onSubmit={handleEmailPassword} className="space-y-4" data-testid="email-password-form">
+              {mode === 'signup' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
+                  />
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Password
+                  </label>
+                  {mode === 'login' && AUTH_FEATURES.forgotPasswordEnabled && (
+                    <Link 
+                      href="/forgot-password" 
+                      className="text-sm text-cyan-600 hover:underline"
+                      data-testid="forgot-password-link"
+                    >
+                      Forgot?
+                    </Link>
+                  )}
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={8}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
+                />
+                {mode === 'signup' && (
+                  <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+                )}
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading === 'email'}
+                className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                data-testid="auth-provider-email"
+              >
+                {loading === 'email' ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Mail className="w-5 h-5" />
+                )}
+                {mode === 'signup' ? 'Create Account' : 'Sign In'}
+              </button>
+            </form>
+          )}
+          
+          {/* Alternative Auth Methods */}
+          <div className="space-y-2">
+            {/* Magic Link Toggle */}
+            {authMethods.magicLink && (
+              <button
+                onClick={() => setShowMagicLink(true)}
+                className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 py-2"
+                data-testid="toggle-magic-link"
+              >
+                ✨ Sign in with magic link (no password needed)
+              </button>
+            )}
+            
+            {/* Phone Auth Toggle */}
+            {authMethods.phone && (
+              <button
+                onClick={() => setShowPhoneAuth(true)}
+                className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 py-2"
+                data-testid="toggle-phone-auth"
+              >
+                📱 Sign in with phone number
+              </button>
+            )}
+          </div>
+          
+          {/* Enterprise SSO */}
+          {authMethods.sso && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Link
+                href="/auth/sso"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                data-testid="auth-provider-sso"
+              >
+                <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  Continue with Enterprise SSO
+                </span>
+              </Link>
+            </div>
+          )}
+        </>
+      )}
+      
+      {/* ==================== MAGIC LINK VIEW ==================== */}
       {showMagicLink && (
         <form onSubmit={handleMagicLink} className="space-y-4" data-testid="magic-link-form">
           <div>
@@ -378,139 +559,104 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
             )}
             Send Magic Link
           </button>
-          
-          <button
-            type="button"
-            onClick={() => setShowMagicLink(false)}
-            className="w-full text-sm text-gray-500 hover:text-gray-700"
-          >
-            Back to password login
-          </button>
         </form>
       )}
       
-      {/* Email/Password Form */}
-      {authMethods.email && !showMagicLink && !showPhoneAuth && (
-        <form onSubmit={handleEmailPassword} className="space-y-4" data-testid="email-password-form">
-          {mode === 'signup' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
-              />
-            </div>
-          )}
-          
+      {/* ==================== PHONE AUTH VIEW ==================== */}
+      {showPhoneAuth && !awaitingOtp && (
+        <form onSubmit={handlePhoneSendOtp} className="space-y-4" data-testid="phone-auth-form">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email
+              Phone Number
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+1 (555) 123-4567"
               required
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
             />
-          </div>
-          
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              {mode === 'login' && AUTH_FEATURES.forgotPasswordEnabled && (
-                <Link 
-                  href="/forgot-password" 
-                  className="text-sm text-cyan-600 hover:underline"
-                  data-testid="forgot-password-link"
-                >
-                  Forgot?
-                </Link>
-              )}
-            </div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={8}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
-            />
-            {mode === 'signup' && (
-              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
-            )}
+            <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +1 for US)</p>
           </div>
           
           <button
             type="submit"
-            disabled={loading === 'email'}
-            className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-            data-testid="auth-provider-email"
+            disabled={loading === 'phone'}
+            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            data-testid="auth-provider-phone"
           >
-            {loading === 'email' ? (
+            {loading === 'phone' ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Mail className="w-5 h-5" />
+              <Phone className="w-5 h-5" />
             )}
-            {mode === 'signup' ? 'Create Account' : 'Sign In'}
+            Send Verification Code
           </button>
         </form>
       )}
       
-      {/* Phone Auth Toggle (if enabled) */}
-      {authMethods.phone && !showMagicLink && !showPhoneAuth && (
-        <button
-          onClick={() => setShowPhoneAuth(true)}
-          className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400"
-          data-testid="toggle-phone-auth"
-        >
-          📱 Sign in with phone number
-        </button>
-      )}
-      
-      {/* Enterprise SSO (if enabled) */}
-      {authMethods.sso && (
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Link
-            href="/auth/sso"
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            data-testid="auth-provider-sso"
+      {/* Phone OTP Verification */}
+      {showPhoneAuth && awaitingOtp && (
+        <form onSubmit={handlePhoneVerifyOtp} className="space-y-4" data-testid="phone-otp-form">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Verification Code
+            </label>
+            <input
+              type="text"
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value)}
+              placeholder="123456"
+              required
+              maxLength={6}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white text-center text-2xl tracking-widest"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading === 'phone_verify'}
+            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            data-testid="auth-provider-phone-verify"
           >
-            <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <span className="font-medium text-gray-700 dark:text-gray-300">
-              Continue with Enterprise SSO
-            </span>
-          </Link>
-        </div>
+            {loading === 'phone_verify' ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              'Verify & Sign In'
+            )}
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => setAwaitingOtp(false)}
+            className="w-full text-sm text-gray-500 hover:text-gray-700"
+          >
+            Resend code
+          </button>
+        </form>
       )}
       
       {/* Switch Mode Link */}
-      <p className="text-center text-gray-600 dark:text-gray-400">
-        {mode === 'login' ? (
-          <>
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-cyan-600 hover:underline font-medium">
-              Sign up free
-            </Link>
-          </>
-        ) : (
-          <>
-            Already have an account?{' '}
-            <Link href="/login" className="text-cyan-600 hover:underline font-medium">
-              Sign in
-            </Link>
-          </>
-        )}
-      </p>
+      {!showMagicLink && !showPhoneAuth && (
+        <p className="text-center text-gray-600 dark:text-gray-400">
+          {mode === 'login' ? (
+            <>
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="text-cyan-600 hover:underline font-medium">
+                Sign up free
+              </Link>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <Link href="/login" className="text-cyan-600 hover:underline font-medium">
+                Sign in
+              </Link>
+            </>
+          )}
+        </p>
+      )}
     </div>
   );
 }
