@@ -1,8 +1,8 @@
 /**
  * Login Page - CR AudioViz AI
  * 
- * Uses shared AuthOptions component to ensure consistency with signup page.
- * All auth providers are rendered from central config - no hardcoding.
+ * Uses shared AuthOptions component to render ALL enabled auth providers.
+ * This ensures login and signup pages stay in sync.
  * 
  * @timestamp January 7, 2026 - 11:33 AM EST
  * @author Claude (for Roy Henderson)
@@ -11,8 +11,8 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import AuthOptions from '@/components/auth/AuthOptions';
 
 export default function LoginPage() {
@@ -26,7 +26,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/25">
+            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/25">
               <div className="relative">
                 <div className="flex gap-1.5 mb-1">
                   <div className="w-2 h-2 bg-white rounded-full" />
@@ -40,17 +40,19 @@ export default function LoginPage() {
           <p className="text-gray-400 mt-2">Sign in to continue to Javari AI</p>
         </div>
 
-        {/* Auth Card */}
-        <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-700/50">
-          <AuthOptions mode="login" redirectTo="/dashboard" />
+        {/* Form Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <AuthOptions 
+            mode="login" 
+            redirectTo="/dashboard"
+          />
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-6">
-          By continuing, you agree to our{' '}
-          <Link href="/terms" className="text-cyan-400 hover:text-cyan-300">Terms of Service</Link>
-          {' '}and{' '}
-          <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300">Privacy Policy</Link>
+        <p className="text-center mt-6 text-gray-500 text-sm">
+          By signing in, you agree to our{' '}
+          <Link href="/terms" className="underline hover:text-gray-300">Terms</Link> and{' '}
+          <Link href="/privacy" className="underline hover:text-gray-300">Privacy Policy</Link>
         </p>
       </motion.div>
     </div>
