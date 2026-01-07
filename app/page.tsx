@@ -45,7 +45,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section - Javari Introduction */}
-      <section className="pt-32 pb-16 px-4">
+      <section className="hero-section pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Javari Avatar */}
