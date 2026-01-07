@@ -8,14 +8,13 @@
  * DO NOT create per-page header variants.
  * 
  * Requirements:
- * - Logo: 40-56px mobile, links to /
- * - NO "CR AudioViz AI" text when logo visible
+ * - Logo: Properly sized for readability (horizontal logo with text)
  * - Nav: Home, Apps, Games, Javari AI, JavariVerse, Pricing, About, Contact
  * - Auth: "Log in" when logged out, "Name | Logout" when logged in
  * 
- * @timestamp January 7, 2026 - 5:20 PM EST
+ * @timestamp January 7, 2026 - 5:58 PM EST
  * @locked PHASE 2.9 UI CONTRACT
- * @fix Replaced CSS icon with actual CR AudioViz AI logo image
+ * @fix Logo properly sized - mobile: 120px wide, desktop: 160px wide
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -141,9 +140,9 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           
           {/* ============================================================
-              LOGO - Actual CR AudioViz AI logo image
-              Mobile: 40px, Desktop: 48px
-              Links to home
+              LOGO - CR AudioViz AI horizontal logo
+              Properly sized for readability
+              Mobile: 120px wide, Desktop: 160px wide
               ============================================================ */}
           <Link 
             href="/" 
@@ -154,12 +153,11 @@ export default function Header() {
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
-              width={48}
-              height={48}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-lg"
+              width={160}
+              height={160}
+              className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px]"
               priority
             />
-            {/* NO text branding - logo is the only brand indicator */}
           </Link>
 
           {/* ============================================================
