@@ -25,91 +25,57 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Playwright E2E tests
-        id: playwright
-        run: npx playwright test --config=playwright.config.ts
-        continue-on-error: true
+      - name: Run Playwright tests
+        id: tests
+        run: |
+          set +e
+          npx playwright test --config=playwright.config.ts 2>&1 | tee test-output.log
+          TEST_EXIT=$?
+          echo "exit_code=$TEST_EXIT" >> $GITHUB_OUTPUT
+          exit 0
 
-      - name: Upload Playwright Report
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+            test-output.log
           retention-days: 30
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: test-results/
-          retention-days: 30
-
-      - name: Create P0 Issue on Failure
-        if: steps.playwright.outcome == 'failure'
+      - name: Check results and create issue if failed
+        if: steps.tests.outputs.exit_code != '0'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            let errorDetails = 'No detailed error captured';
-            let failedTests = [];
+            let output = '';
             try {
-              if (fs.existsSync('test-results/results.json')) {
-                const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
-                if (results.suites) {
-                  for (const suite of results.suites) {
-                    for (const spec of suite.specs || []) {
-                      for (const test of spec.tests || []) {
-                        if (test.status === 'failed' || test.status === 'timedOut') {
-                          const result = test.results && test.results[0];
-                          failedTests.push({
-                            title: spec.title,
-                            error: result && result.error && result.error.message || 'Unknown error'
-                          });
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              output = fs.readFileSync('test-output.log', 'utf8');
             } catch (e) {
-              console.log('Could not parse results:', e.message);
+              output = 'Could not read test output';
             }
-            try {
-              if (fs.existsSync('test-results/errors.log')) {
-                errorDetails = fs.readFileSync('test-results/errors.log', 'utf8').substring(0, 3000);
-              }
-            } catch (e) {}
             const runUrl = 'https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId;
-            let body = '## P0: E2E Test Failure - craudiovizai.com\n\n';
-            body += 'Severity: P0 - Production Blocker\n';
-            body += 'Target: https://craudiovizai.com\n';
-            body += 'Workflow Run: ' + runUrl + '\n';
-            body += 'Timestamp: ' + new Date().toISOString() + '\n\n';
-            body += '### Failed Tests\n\n';
-            if (failedTests.length > 0) {
-              for (const ft of failedTests) {
-                body += '#### ' + ft.title + '\n```\n' + ft.error.substring(0, 1000) + '\n```\n\n';
-              }
-            } else {
-              body += '```\n' + errorDetails + '\n```\n';
-            }
-            body += '\n### Artifacts\n- [Playwright Report](' + runUrl + '#artifacts)\n- [Test Results](' + runUrl + '#artifacts)\n';
+            const body = '## E2E Test Failure\n\n' +
+              'Target: https://craudiovizai.com\n' +
+              'Run: ' + runUrl + '\n' +
+              'Time: ' + new Date().toISOString() + '\n\n' +
+              '### Output\n```\n' + output.substring(output.length - 3000) + '\n```\n\n' +
+              '[View full artifacts](' + runUrl + '#artifacts)';
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: '[P0] E2E Failure: craudiovizai.com critical flow broken',
+              title: '[E2E] Test failure on craudiovizai.com',
               body: body,
-              labels: ['bug', 'P0', 'e2e-failure']
+              labels: ['bug', 'e2e-failure']
             });
 
-      - name: Fail workflow if tests failed
-        if: steps.playwright.outcome == 'failure'
+      - name: Fail if tests failed
+        if: steps.tests.outputs.exit_code != '0'
         run: exit 1
 
       - name: Success
-        if: steps.playwright.outcome == 'success'
-        run: |
-          echo "All E2E tests passed"
-          echo "/login VERIFIED - no client-side exceptions"
+        if: steps.tests.outputs.exit_code == '0'
+        run: echo "All E2E tests passed! /login verified."
