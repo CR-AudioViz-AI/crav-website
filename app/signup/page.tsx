@@ -1,10 +1,12 @@
 /**
  * Signup Page - CR AudioViz AI
  * 
- * Uses shared AuthOptions component and inherits Header/Footer from root layout.
+ * ⚠️ UI CONTRACT LOCK - PHASE 2.9
+ * This page MUST use the shared Header/Footer from root layout.
+ * NO special layout allowed.
  * 
- * @timestamp January 7, 2026 - 11:56 AM EST
- * @author Claude (for Roy Henderson)
+ * @timestamp January 7, 2026 - 12:18 PM EST
+ * @locked PHASE 2.9 UI CONTRACT
  */
 
 'use client';
@@ -15,7 +17,7 @@ import AuthOptions from '@/components/auth/AuthOptions';
 
 export default function SignupPage() {
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
+    <div className="min-h-[calc(100vh-300px)] flex items-center justify-center py-12 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
