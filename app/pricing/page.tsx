@@ -14,7 +14,7 @@ const STATIC_PLANS = [
     name: 'Free',
     price: '$0',
     credits: 50,
-    features: ['50 credits/month', 'Access to all apps', 'Community support'],
+    features: ['50 credits/month', 'Access to all apps', 'AI support with escalation'],
     cta: 'Get Started',
     popular: false,
   },
@@ -22,7 +22,7 @@ const STATIC_PLANS = [
     name: 'Pro',
     price: '$19',
     credits: 500,
-    features: ['500 credits/month', 'Priority support', 'Advanced features', 'API access'],
+    features: ['500 credits/month', 'AI support with escalation', 'Advanced features', 'API access'],
     cta: 'Upgrade to Pro',
     popular: true,
   },
@@ -30,7 +30,7 @@ const STATIC_PLANS = [
     name: 'Enterprise',
     price: '$99',
     credits: 5000,
-    features: ['5000 credits/month', 'Dedicated support', 'Custom integrations', 'SLA guarantee'],
+    features: ['5000 credits/month', 'AI support with escalation', 'Custom integrations', 'SLA guarantee'],
     cta: 'Contact Sales',
     popular: false,
   },
@@ -134,9 +134,12 @@ export default function PricingPage() {
           ))}
         </div>
         
-        <div className="mt-12 text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            All plans include a 14-day money-back guarantee
+        <div className="mt-12 text-center space-y-2">
+          <p className="text-gray-600 dark:text-gray-400 font-medium">
+            No refunds. Credits valid until term ends.
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">
+            All plans include AI support with escalation to human agents when needed.
           </p>
           <Link href="/apps" className="inline-block mt-4 text-blue-600 hover:text-blue-700 font-medium">
             Explore our apps →
