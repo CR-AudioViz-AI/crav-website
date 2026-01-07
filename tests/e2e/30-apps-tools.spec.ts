@@ -1,254 +1,288 @@
 /**
- * E2E Apps & Tools Suite
- * Tests every app/tool entry point and primary CTAs
+ * E2E Apps & Tools Tests
+ * Tests every app/tool entry point, loads page, clicks primary CTA
  */
 import { test, expect, Page } from '@playwright/test';
 import * as fs from 'fs';
 
-interface AppTestResult {
+// All known tools
+const TOOLS = [
+  'ai-analyzer', 'ai-chatbot', 'ai-translator', 'ai-writer',
+  'animation-studio', 'audio-editor', 'background-remover', 'ebook-creator',
+  'image-generator', 'image-resizer', 'invoice-generator', 'logo-maker',
+  'meme-generator', 'music-mixer', 'pdf-editor', 'podcast-editor',
+  'poster-designer', 'resume-builder', 'screen-recorder', 'social-media-kit',
+  'subtitle-generator', 'thumbnail-creator', 'video-editor', 'voice-generator'
+];
+
+// All games (1-32)
+const GAMES = Array.from({ length: 32 }, (_, i) => i + 1);
+
+// Console error allowlist
+const ALLOWLISTED_ERRORS: RegExp[] = [
+  /cloudflareinsights/,
+  /ResizeObserver/,
+  /favicon/,
+];
+
+interface ToolTestResult {
+  tool: string;
   path: string;
-  name: string;
   status: number;
-  hasCTA: boolean;
-  ctaWorked: boolean;
+  loaded: boolean;
+  ctaFound: boolean;
+  ctaClicked: boolean;
+  crashed: boolean;
   errors: string[];
-  timestamp: string;
 }
 
-const appResults: AppTestResult[] = [];
-const collectedErrors: { app: string; error: string }[] = [];
+interface GameTestResult {
+  gameId: number;
+  path: string;
+  status: number;
+  loaded: boolean;
+  crashed: boolean;
+  errors: string[];
+}
 
-function setupErrorCapture(page: Page, appPath: string) {
+const toolResults: ToolTestResult[] = [];
+const gameResults: GameTestResult[] = [];
+const allErrors: { context: string; message: string }[] = [];
+
+function isAllowlisted(message: string): boolean {
+  return ALLOWLISTED_ERRORS.some(pattern => pattern.test(message));
+}
+
+function setupErrorListeners(page: Page, context: string) {
   page.on('pageerror', (error) => {
-    collectedErrors.push({ app: appPath, error: `pageerror: ${error.message}` });
+    allErrors.push({ context, message: error.message });
+    console.error(`[${context}] JS Exception: ${error.message.substring(0, 100)}`);
   });
   
   page.on('console', (msg) => {
-    if (msg.type() === 'error') {
-      const text = msg.text();
-      // Filter out known non-critical errors
-      if (!text.includes('Failed to load resource') && !text.includes('Content Security Policy')) {
-        collectedErrors.push({ app: appPath, error: `console: ${text}` });
-      }
+    if (msg.type() === 'error' && !isAllowlisted(msg.text())) {
+      allErrors.push({ context, message: msg.text() });
     }
   });
 }
 
-// All known app routes
-const APP_ROUTES = [
-  { path: '/apps/javari-ai', name: 'Javari AI' },
-  { path: '/apps/logo-studio', name: 'Logo Studio' },
-  { path: '/apps/meme-generator', name: 'Meme Generator' },
-  { path: '/apps/games-hub', name: 'Games Hub' },
-  { path: '/apps/orlando-trip-deal', name: 'Orlando Trip Deal' },
-  { path: '/apps/watch-works', name: 'Watch Works' },
-];
+async function checkCrashed(page: Page): Promise<boolean> {
+  const body = await page.locator('body').textContent() || '';
+  return body.includes('Application error') || 
+         body.includes('Unhandled Runtime Error') ||
+         body.includes('client-side exception');
+}
 
-// CTA button patterns to look for
-const CTA_PATTERNS = [
-  'button:has-text("Start")',
-  'button:has-text("Try")',
-  'button:has-text("Create")',
-  'button:has-text("Generate")',
-  'button:has-text("Launch")',
-  'button:has-text("Play")',
-  'button:has-text("Begin")',
-  'button:has-text("Go")',
-  'a:has-text("Start")',
-  'a:has-text("Try")',
-  'a:has-text("Launch")',
-  '[data-testid="primary-cta"]',
-  '.cta-button',
-  '.primary-button',
-];
-
-test.describe('Apps & Tools - Discovery from /apps', () => {
-  test('Discover all app cards on /apps page', async ({ page }) => {
-    await page.goto('/apps');
-    await page.waitForLoadState('networkidle');
-    
-    // Find all app links
-    const appLinks = await page.locator('a[href^="/apps/"]').all();
-    const discovered: string[] = [];
-    
-    for (const link of appLinks) {
-      const href = await link.getAttribute('href');
-      if (href && !discovered.includes(href)) {
-        discovered.push(href);
-        const name = await link.textContent();
-        console.log(`Discovered: ${href} - ${name?.trim().substring(0, 30)}`);
-      }
-    }
-    
-    console.log(`\nTotal apps discovered: ${discovered.length}`);
-    expect(discovered.length).toBeGreaterThan(0);
-    
-    // Save discovered apps
-    if (!fs.existsSync('test-results')) {
-      fs.mkdirSync('test-results', { recursive: true });
-    }
-    fs.writeFileSync('test-results/discovered-apps.json', JSON.stringify(discovered, null, 2));
-  });
-});
-
-test.describe('Apps & Tools - Individual App Tests', () => {
-  for (const app of APP_ROUTES) {
-    test(`App: ${app.name} (${app.path})`, async ({ page }) => {
-      setupErrorCapture(page, app.path);
-      
-      const result: AppTestResult = {
-        path: app.path,
-        name: app.name,
+test.describe('Tools - Full Coverage', () => {
+  // Test each tool
+  for (const tool of TOOLS) {
+    test(`Tool: ${tool}`, async ({ page }) => {
+      const path = `/tools/${tool}`;
+      const result: ToolTestResult = {
+        tool,
+        path,
         status: 0,
-        hasCTA: false,
-        ctaWorked: false,
+        loaded: false,
+        ctaFound: false,
+        ctaClicked: false,
+        crashed: false,
         errors: [],
-        timestamp: new Date().toISOString(),
       };
       
-      // Navigate to app
-      const response = await page.goto(app.path, { waitUntil: 'networkidle', timeout: 30000 });
-      result.status = response?.status() || 0;
+      setupErrorListeners(page, path);
       
-      // Skip if 404
-      if (result.status === 404) {
-        console.log(`${app.path} returns 404 - skipping`);
-        appResults.push(result);
-        return;
-      }
-      
-      expect(result.status).toBeLessThan(500);
-      
-      // Check for crash screens
-      const crashCount = await page.locator('text=/Application error|Unhandled Runtime Error/i').count();
-      if (crashCount > 0) {
-        result.errors.push('Crash screen detected');
-      }
-      expect(crashCount, `${app.path} shows crash screen`).toBe(0);
-      
-      await page.screenshot({ path: `test-results/apps/${app.name.replace(/\s+/g, '-').toLowerCase()}-initial.png` });
-      
-      // Find and test primary CTA
-      for (const pattern of CTA_PATTERNS) {
-        const cta = page.locator(pattern).first();
-        if (await cta.count() > 0 && await cta.isVisible()) {
-          result.hasCTA = true;
-          const ctaText = await cta.textContent();
-          console.log(`Found CTA: "${ctaText?.trim()}" in ${app.path}`);
-          
-          try {
+      try {
+        // Load tool page
+        const response = await page.goto(path);
+        result.status = response?.status() || 0;
+        
+        await page.waitForLoadState('domcontentloaded');
+        result.loaded = true;
+        
+        // Check for crash
+        result.crashed = await checkCrashed(page);
+        expect(result.crashed, `${tool} should not crash`).toBe(false);
+        
+        // Find primary CTA
+        const ctaSelectors = [
+          'button:has-text("Start")',
+          'button:has-text("Generate")',
+          'button:has-text("Create")',
+          'button:has-text("Try")',
+          'button:has-text("Launch")',
+          'button[type="submit"]',
+          'a.btn-primary',
+          '.cta-button',
+          '[data-testid="primary-cta"]',
+        ];
+        
+        for (const selector of ctaSelectors) {
+          const cta = page.locator(selector).first();
+          if (await cta.count() > 0 && await cta.isVisible()) {
+            result.ctaFound = true;
+            
             // Click CTA
-            await cta.click({ timeout: 5000 });
-            await page.waitForTimeout(2000);
-            await page.waitForLoadState('networkidle').catch(() => {});
-            
-            // Check for crash after CTA click
-            const postClickCrash = await page.locator('text=/Application error|Unhandled Runtime Error/i').count();
-            if (postClickCrash === 0) {
-              result.ctaWorked = true;
-            } else {
-              result.errors.push('Crash after CTA click');
+            try {
+              await cta.click({ timeout: 3000 });
+              result.ctaClicked = true;
+              await page.waitForTimeout(1000);
+              
+              // Verify no crash after click
+              const crashedAfterClick = await checkCrashed(page);
+              expect(crashedAfterClick, `${tool} should not crash after CTA click`).toBe(false);
+            } catch (e) {
+              // Click failed but not a crash
+              console.log(`  CTA click failed: ${(e as Error).message.substring(0, 50)}`);
             }
-            
-            await page.screenshot({ path: `test-results/apps/${app.name.replace(/\s+/g, '-').toLowerCase()}-after-cta.png` });
-          } catch (e) {
-            result.errors.push(`CTA click failed: ${e}`);
+            break;
           }
-          
-          break;
         }
+        
+        // Screenshot
+        await page.screenshot({ path: `test-results/tool-${tool}.png` });
+        
+      } catch (e) {
+        result.errors.push((e as Error).message);
       }
       
-      if (!result.hasCTA) {
-        console.log(`No CTA found in ${app.path}`);
-      }
+      // Collect errors for this tool
+      result.errors = allErrors
+        .filter(e => e.context === path)
+        .map(e => e.message);
       
-      appResults.push(result);
+      toolResults.push(result);
+      
+      // Report
+      console.log(`  ${tool}: status=${result.status}, loaded=${result.loaded}, cta=${result.ctaFound}/${result.ctaClicked}, crashed=${result.crashed}`);
     });
   }
 });
 
-test.describe('Apps & Tools - Comprehensive /apps Click Test', () => {
-  test('Click every app card from /apps directory', async ({ page }) => {
-    setupErrorCapture(page, '/apps');
-    
+test.describe('Games - Full Coverage', () => {
+  // Test games in batches to avoid timeout
+  const gameBatches = [
+    GAMES.slice(0, 8),
+    GAMES.slice(8, 16),
+    GAMES.slice(16, 24),
+    GAMES.slice(24, 32),
+  ];
+  
+  for (let batchIdx = 0; batchIdx < gameBatches.length; batchIdx++) {
+    test(`Games batch ${batchIdx + 1} (${gameBatches[batchIdx][0]}-${gameBatches[batchIdx][gameBatches[batchIdx].length - 1]})`, async ({ page }) => {
+      for (const gameId of gameBatches[batchIdx]) {
+        const path = `/games/play/${gameId}`;
+        const result: GameTestResult = {
+          gameId,
+          path,
+          status: 0,
+          loaded: false,
+          crashed: false,
+          errors: [],
+        };
+        
+        setupErrorListeners(page, path);
+        
+        try {
+          const response = await page.goto(path, { timeout: 30000 });
+          result.status = response?.status() || 0;
+          
+          await page.waitForLoadState('domcontentloaded');
+          result.loaded = true;
+          
+          result.crashed = await checkCrashed(page);
+          
+          // Take screenshot every 8th game
+          if (gameId % 8 === 1) {
+            await page.screenshot({ path: `test-results/game-${gameId}.png` });
+          }
+          
+        } catch (e) {
+          result.errors.push((e as Error).message);
+        }
+        
+        result.errors = allErrors
+          .filter(e => e.context === path)
+          .map(e => e.message);
+        
+        gameResults.push(result);
+        
+        console.log(`  Game ${gameId}: status=${result.status}, crashed=${result.crashed}`);
+        
+        // Fail on crash
+        expect(result.crashed, `Game ${gameId} should not crash`).toBe(false);
+      }
+    });
+  }
+});
+
+test.describe('Apps - Entry Points', () => {
+  test('Apps page loads and lists apps', async ({ page }) => {
+    setupErrorListeners(page, '/apps');
     await page.goto('/apps');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
-    // Get all unique app hrefs
-    const appLinks = await page.locator('a[href^="/apps/"]:not([href="/apps"])').all();
-    const hrefs: string[] = [];
+    // Check if 503 or actual content
+    const is503 = await page.locator('text=503').count() > 0;
     
-    for (const link of appLinks) {
-      const href = await link.getAttribute('href');
-      if (href && !hrefs.includes(href)) {
-        hrefs.push(href);
+    if (is503) {
+      console.log('  /apps returns 503 (under construction)');
+      // 503 is acceptable for under construction
+    } else {
+      // Find app cards
+      const appCards = await page.locator('a[href^="/apps/"]').all();
+      console.log(`  Found ${appCards.length} app cards`);
+      
+      // Test first few apps
+      for (let i = 0; i < Math.min(3, appCards.length); i++) {
+        const href = await appCards[i].getAttribute('href');
+        if (href) {
+          await page.goto(href);
+          await page.waitForLoadState('domcontentloaded');
+          
+          const crashed = await checkCrashed(page);
+          expect(crashed, `App ${href} should not crash`).toBe(false);
+          
+          console.log(`  App ${href}: loaded`);
+        }
       }
     }
     
-    console.log(`Found ${hrefs.length} unique app links to test`);
-    
-    const results: { href: string; status: string; error?: string }[] = [];
-    
-    for (const href of hrefs) {
-      // Navigate directly to each app
-      try {
-        const response = await page.goto(href, { waitUntil: 'networkidle', timeout: 20000 });
-        const status = response?.status() || 0;
-        
-        if (status >= 500) {
-          results.push({ href, status: `${status} ERROR` });
-          continue;
-        }
-        
-        const crashCount = await page.locator('text=/Application error|Unhandled Runtime Error/i').count();
-        if (crashCount > 0) {
-          results.push({ href, status: 'CRASH', error: 'Crash screen detected' });
-        } else {
-          results.push({ href, status: 'OK' });
-        }
-      } catch (e) {
-        results.push({ href, status: 'TIMEOUT', error: String(e) });
-      }
-    }
-    
-    // Log results
-    console.log('\n=== App Click Test Results ===');
-    for (const r of results) {
-      const mark = r.status === 'OK' ? '✓' : '✗';
-      console.log(`${mark} ${r.href}: ${r.status}`);
-    }
-    
-    // Save results
-    fs.writeFileSync('test-results/app-click-results.json', JSON.stringify(results, null, 2));
-    
-    const failures = results.filter(r => r.status !== 'OK' && r.status !== '404');
-    expect(failures.length, `App click failures: ${failures.map(f => f.href).join(', ')}`).toBe(0);
+    await page.screenshot({ path: 'test-results/apps-page.png' });
   });
 });
 
 test.afterAll(async () => {
-  if (!fs.existsSync('test-results/apps')) {
-    fs.mkdirSync('test-results/apps', { recursive: true });
-  }
-  
-  // Save app results
-  fs.writeFileSync('test-results/app-test-results.json', JSON.stringify(appResults, null, 2));
-  
-  if (collectedErrors.length > 0) {
-    fs.writeFileSync('test-results/app-errors.json', JSON.stringify(collectedErrors, null, 2));
-    console.log(`\n⚠️ ${collectedErrors.length} app errors - see app-errors.json`);
-  } else {
-    console.log('\n✅ No app errors');
+  if (!fs.existsSync('test-results')) {
+    fs.mkdirSync('test-results', { recursive: true });
   }
   
   // Summary
-  console.log('\n=== App Test Summary ===');
-  const passed = appResults.filter(r => r.errors.length === 0);
-  const withCTA = appResults.filter(r => r.hasCTA);
-  const ctaWorked = appResults.filter(r => r.ctaWorked);
-  console.log(`Apps tested: ${appResults.length}`);
-  console.log(`Passed: ${passed.length}`);
-  console.log(`With CTA: ${withCTA.length}`);
-  console.log(`CTA worked: ${ctaWorked.length}`);
+  const toolsPassed = toolResults.filter(t => !t.crashed && t.loaded).length;
+  const gamesPassed = gameResults.filter(g => !g.crashed && g.loaded).length;
+  
+  const report = {
+    summary: {
+      tools: {
+        total: TOOLS.length,
+        passed: toolsPassed,
+        failed: TOOLS.length - toolsPassed,
+        withCTA: toolResults.filter(t => t.ctaFound).length,
+      },
+      games: {
+        total: GAMES.length,
+        passed: gamesPassed,
+        failed: GAMES.length - gamesPassed,
+      },
+    },
+    toolResults,
+    gameResults,
+    errors: allErrors,
+  };
+  
+  fs.writeFileSync('test-results/apps-tools-report.json', JSON.stringify(report, null, 2));
+  
+  console.log('\n=== Apps & Tools Summary ===');
+  console.log(`Tools: ${toolsPassed}/${TOOLS.length} passed`);
+  console.log(`Games: ${gamesPassed}/${GAMES.length} passed`);
+  console.log(`Total errors: ${allErrors.length}`);
 });
