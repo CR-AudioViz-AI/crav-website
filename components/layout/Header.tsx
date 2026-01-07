@@ -1,33 +1,38 @@
 'use client';
 
 /**
- * CR AudioViz AI - Universal Header Component
+ * CR AudioViz AI - LOCKED HEADER COMPONENT
  * 
- * Features:
- * - Mobile-optimized logo (40-56px, links to home)
- * - No redundant title text next to logo
- * - Auth state: Logged out = "Login" button, Logged in = Name + Logout
- * - Consistent across ALL pages including login/signup
- * - 48px touch targets for mobile
+ * ⚠️ UI CONTRACT LOCK - PHASE 2.9
+ * This is the SINGLE SOURCE OF TRUTH for all page headers.
+ * DO NOT create per-page header variants.
  * 
- * @timestamp January 7, 2026 - 11:52 AM EST
- * @author Claude (for Roy Henderson)
+ * Requirements:
+ * - Logo: 40-56px mobile, links to /
+ * - NO "CR AudioViz AI" text when logo visible
+ * - Nav: Home, Apps, Games, Javari AI, JavariVerse, Pricing, About, Contact
+ * - Auth: "Log in" when logged out, "Name | Logout" when logged in
+ * 
+ * @timestamp January 7, 2026 - 12:10 PM EST
+ * @locked PHASE 2.9 UI CONTRACT
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Menu, X, User, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
-// Navigation links
+// ============================================================================
+// LOCKED NAVIGATION - DO NOT MODIFY ORDER
+// ============================================================================
 const NAV_LINKS = [
+  { id: 'home', label: 'Home', href: '/' },
   { id: 'apps', label: 'Apps', href: '/apps' },
   { id: 'games', label: 'Games', href: '/games' },
-  { id: 'javari', label: 'Javari AI', href: '/javari' },
-  { id: 'craiverse', label: 'CRAIverse', href: '/craiverse' },
+  { id: 'javari-ai', label: 'Javari AI', href: '/javari' },
+  { id: 'javari-verse', label: 'JavariVerse', href: '/javari-verse' },
   { id: 'pricing', label: 'Pricing', href: '/pricing' },
   { id: 'about', label: 'About', href: '/about' },
   { id: 'contact', label: 'Contact', href: '/contact' },
@@ -36,7 +41,6 @@ const NAV_LINKS = [
 interface UserProfile {
   full_name?: string;
   display_name?: string;
-  email?: string;
   role?: string;
   is_admin?: boolean;
 }
@@ -114,22 +118,36 @@ export default function Header() {
   }, [supabase, router]);
 
   // Get display name for logged-in user
-  const getDisplayName = () => {
+  const getDisplayName = (): string => {
     if (profile?.display_name) return profile.display_name;
     if (profile?.full_name) return profile.full_name.split(' ')[0];
     if (user?.email) return user.email.split('@')[0];
     return 'Account';
   };
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string): boolean => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-white/10">
+    <header 
+      className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-white/10"
+      data-testid="site-header"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
-          {/* Logo - Links to Home, Mobile Optimized */}
-          <Link href="/" className="flex items-center flex-shrink-0">
+          {/* ============================================================
+              LOGO - Links to /, NO text branding when visible
+              Mobile: 40px, Desktop: 48px
+              ============================================================ */}
+          <Link 
+            href="/" 
+            className="flex items-center flex-shrink-0"
+            data-testid="header-logo"
+            aria-label="CR AudioViz AI Home"
+          >
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
               <div className="relative">
                 <div className="flex gap-1 mb-0.5">
@@ -139,14 +157,13 @@ export default function Header() {
                 <div className="w-3 h-1 md:w-4 md:h-1.5 bg-white rounded-full mx-auto" />
               </div>
             </div>
-            {/* Brand text - hidden on mobile, visible on md+ */}
-            <span className="hidden md:block ml-3 text-xl font-bold text-white">
-              CR AudioViz AI
-            </span>
+            {/* NO text branding - logo is the only brand indicator */}
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          {/* ============================================================
+              DESKTOP NAVIGATION - Exact order per UI contract
+              ============================================================ */}
+          <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.id}
@@ -156,25 +173,31 @@ export default function Header() {
                     ? 'bg-cyan-500/20 text-cyan-400'
                     : 'text-gray-300 hover:text-white hover:bg-white/5'
                 }`}
+                data-testid={`nav-link-${link.id}`}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Auth Section */}
+          {/* ============================================================
+              AUTH SECTION
+              Logged out: "Log in" button
+              Logged in: "Name | Logout"
+              ============================================================ */}
           <div className="flex items-center gap-2 md:gap-4">
             {/* Desktop Auth */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3" data-testid="auth-section">
               {loading ? (
                 <div className="w-20 h-10 bg-gray-800 rounded-lg animate-pulse" />
               ) : user ? (
-                // Logged In: Show Name + Logout
-                <div className="flex items-center gap-3">
+                // Logged In: Name | Logout
+                <div className="flex items-center gap-2" data-testid="auth-logged-in">
                   {isAdmin && (
                     <Link
                       href="/admin"
                       className="flex items-center gap-1 px-3 py-2 text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                      data-testid="admin-link"
                     >
                       <Shield className="w-4 h-4" />
                       Admin
@@ -183,29 +206,29 @@ export default function Header() {
                   <Link
                     href="/dashboard"
                     className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white transition-colors"
+                    data-testid="user-name"
                   >
                     <User className="w-4 h-4" />
                     {getDisplayName()}
                   </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <span className="text-gray-600">|</span>
+                  <button
                     onClick={handleSignOut}
-                    className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                    data-testid="logout-button"
                   >
-                    <LogOut className="w-4 h-4 mr-1" />
                     Logout
-                  </Button>
+                  </button>
                 </div>
               ) : (
-                // Logged Out: Show Login button
-                <Link href="/login">
+                // Logged Out: "Log in" button
+                <Link href="/login" data-testid="auth-logged-out">
                   <Button
                     variant="default"
                     size="sm"
                     className="bg-cyan-600 hover:bg-cyan-700 text-white"
                   >
-                    Login
+                    Log in
                   </Button>
                 </Link>
               )}
@@ -216,6 +239,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
               aria-label="Toggle menu"
+              data-testid="mobile-menu-button"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -223,9 +247,14 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ============================================================
+          MOBILE MENU
+          ============================================================ */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 bg-slate-950/98 backdrop-blur-lg z-40 overflow-y-auto">
+        <div 
+          className="lg:hidden fixed inset-0 top-16 bg-slate-950/98 backdrop-blur-lg z-40 overflow-y-auto"
+          data-testid="mobile-menu"
+        >
           <div className="px-4 py-6 space-y-2">
             {/* Nav Links */}
             {NAV_LINKS.map((link) => (
@@ -238,6 +267,7 @@ export default function Header() {
                     : 'text-gray-200 hover:bg-white/5 active:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
+                data-testid={`mobile-nav-${link.id}`}
               >
                 {link.label}
                 <ChevronRight className="w-5 h-5 text-gray-500" />
@@ -294,7 +324,7 @@ export default function Header() {
                 >
                   <span className="flex items-center gap-3">
                     <LogOut className="w-5 h-5" />
-                    Sign Out
+                    Logout
                   </span>
                 </button>
               </>
@@ -306,7 +336,7 @@ export default function Header() {
                   className="block w-full py-4 text-center rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-medium min-h-[48px]"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Login
+                  Log in
                 </Link>
                 <Link
                   href="/signup"
