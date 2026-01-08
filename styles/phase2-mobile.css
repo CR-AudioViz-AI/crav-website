@@ -1,8 +1,15 @@
 /* ==========================================================================
-   CraudioVizAI — Phase 2 Mobile-First CSS (v1.2 Compliance)
+   CraudioVizAI — Phase 2 Mobile-First CSS (v1.3 - FOOTER FIX)
    File: src/styles/phase2-mobile.css
 
    Scope: Compliance-only styling to satisfy Phase 2 Exit Validation Checklist v1.2
+   
+   FOOTER FIX (v1.3):
+   - Scoped footer styles to .site-footer class
+   - Uses ::after pseudo-element for 44px tap targets
+   - Keeps visual appearance compact
+   - Maintains WCAG 2.2 AA accessibility
+   
    Constraints:
    - No redesign intent
    - No animations
@@ -507,36 +514,108 @@ input[type="password"],
 }
 
 /* ==========================================================================
-   Footer + Global nav (compliance only)
+   FOOTER STYLES - SCOPED TO .site-footer (v1.3 FIX)
+   
+   Uses ::after pseudo-element for 44px tap targets
+   while keeping visual appearance compact.
+   
    [GATE 6] Footer no horizontal scroll
-   [GATE 7] Footer tap targets >=44
+   [GATE 7] Footer tap targets >=44 via invisible hit area
    ========================================================================== */
 
-.site-footer,
-.footer,
-footer {
+.site-footer {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
 }
 
+/* Footer links - COMPACT visual appearance */
 .site-footer a,
-.footer a,
-footer a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-3);
+.site-footer .footer-link {
+  /* Reset any inherited min-height */
+  min-height: auto;
+  /* Compact inline display */
+  display: inline-block;
+  /* Relative positioning for ::after hit area */
+  position: relative;
+  /* Normal padding for visual appearance */
+  padding: 2px 0;
+  /* Normal line height */
+  line-height: 1.4;
 }
 
-/* If footer links are in a grid/list */
-.footer-links,
-.site-footer__links,
-.footer-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+/* 
+ * INVISIBLE HIT AREA via ::after pseudo-element
+ * Creates 44px tap target without inflating visual layout
+ */
+.site-footer a::after,
+.site-footer .footer-link::after {
+  content: '';
+  position: absolute;
+  /* Center the hit area vertically on the link */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* 44px minimum tap target */
+  min-width: 44px;
+  min-height: 44px;
+  /* Extend horizontally to cover link text */
+  width: 100%;
+  /* Invisible */
+  background: transparent;
+}
+
+/* Footer headings */
+.site-footer h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Footer lists - compact spacing */
+.site-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.site-footer li {
+  /* Compact vertical spacing between items */
+  margin-bottom: 0.25rem;
+}
+
+/* Ensure footer grid doesn't overflow */
+.site-footer .grid {
   max-width: 100%;
+}
+
+/* ==========================================================================
+   NON-SCOPED FOOTER FALLBACK (for pages without .site-footer)
+   Only applies if .site-footer class is NOT present
+   ========================================================================== */
+
+footer:not(.site-footer) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+footer:not(.site-footer) a {
+  position: relative;
+  display: inline-block;
+  padding: 2px 0;
+}
+
+footer:not(.site-footer) a::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  background: transparent;
 }
 
 /* ==========================================================================
