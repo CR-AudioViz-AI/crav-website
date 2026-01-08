@@ -1,6 +1,6 @@
 // /app/page.tsx
 // CR AudioViz AI - Main Landing Page
-// Streamlined - no redundant apps section
+// Expanded What We're Building section, full-width showcase
 
 'use client';
 
@@ -8,13 +8,17 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Brain, Shield, Zap, Users, Cpu } from 'lucide-react';
+import { 
+  ArrowRight, Sparkles, Brain, Shield, Zap, Users, Cpu,
+  Briefcase, Palette, Plane, Home, ShoppingBag, Gamepad2,
+  FileText, Camera, Music, MessageSquare, Vote, Rocket,
+  Globe, Server, Code, Lightbulb
+} from 'lucide-react';
 
 export default function LandingPage() {
   const [comingSoonProjects, setComingSoonProjects] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch from admin API - empty means section won't show
     setComingSoonProjects([]);
   }, []);
 
@@ -22,7 +26,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       
       {/* Hero Section - Javari Introduction */}
-      <section className="hero-section pt-8 pb-12 px-4">
+      <section className="hero-section pt-8 pb-10 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-5 gap-8 items-start">
             {/* Javari Avatar */}
@@ -65,19 +69,19 @@ export default function LandingPage() {
                 with intelligent tools that actually understand you.
               </p>
 
-              <p className="text-gray-400 mb-6 leading-relaxed">
+              <p className="text-gray-400 mb-5 leading-relaxed">
                 I'm not just another chatbot. I'm your <strong className="text-cyan-400">autonomous AI partner</strong> with 
                 advanced capabilities that set me apart from anything you've experienced before.
               </p>
 
               {/* Javari's Advanced Capabilities */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="bg-gray-800/60 p-3 rounded-lg border border-cyan-500/30">
                   <div className="flex items-center gap-2 mb-1">
                     <Brain className="w-4 h-4 text-cyan-400" />
                     <span className="text-cyan-400 font-semibold text-sm">Autonomous Learning</span>
                   </div>
-                  <p className="text-gray-400 text-xs">I learn from every interaction, adapting to your preferences and workflow without being told.</p>
+                  <p className="text-gray-400 text-xs">I learn from every interaction, adapting to your preferences without being told.</p>
                 </div>
                 
                 <div className="bg-gray-800/60 p-3 rounded-lg border border-purple-500/30">
@@ -85,7 +89,7 @@ export default function LandingPage() {
                     <Shield className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-400 font-semibold text-sm">Self-Healing Systems</span>
                   </div>
-                  <p className="text-gray-400 text-xs">I detect and fix errors automatically, ensuring your projects stay on track 24/7.</p>
+                  <p className="text-gray-400 text-xs">I detect and fix errors automatically, keeping your projects on track 24/7.</p>
                 </div>
                 
                 <div className="bg-gray-800/60 p-3 rounded-lg border border-green-500/30">
@@ -93,7 +97,7 @@ export default function LandingPage() {
                     <Cpu className="w-4 h-4 text-green-400" />
                     <span className="text-green-400 font-semibold text-sm">Synthetic Intelligence</span>
                   </div>
-                  <p className="text-gray-400 text-xs">I combine multiple AI models (GPT-4, Claude, Gemini) to give you the best response for each task.</p>
+                  <p className="text-gray-400 text-xs">I combine GPT-4, Claude, and Gemini to give you the best response for each task.</p>
                 </div>
                 
                 <div className="bg-gray-800/60 p-3 rounded-lg border border-orange-500/30">
@@ -101,23 +105,8 @@ export default function LandingPage() {
                     <Zap className="w-4 h-4 text-orange-400" />
                     <span className="text-orange-400 font-semibold text-sm">Real-Time Processing</span>
                   </div>
-                  <p className="text-gray-400 text-xs">Voice, video, and instant document generation — I work at the speed of thought.</p>
+                  <p className="text-gray-400 text-xs">Voice, video, and instant generation — I work at the speed of thought.</p>
                 </div>
-              </div>
-
-              {/* What CR AudioViz Offers */}
-              <div className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 p-4 rounded-xl border border-gray-700 mb-6">
-                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-yellow-400" />
-                  What We're Building
-                </h3>
-                <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• <strong className="text-white">AI Business Apps</strong> — Logos, documents, invoices, social media, presentations</li>
-                  <li>• <strong className="text-white">Intelligent Automation</strong> — Let me handle repetitive tasks while you focus on growth</li>
-                  <li>• <strong className="text-white">Memory & Context</strong> — I remember our conversations and your preferences</li>
-                  <li>• <strong className="text-white">Enterprise Ready</strong> — White-label solutions for businesses of all sizes</li>
-                  <li>• <strong className="text-white">JavariVerse</strong> — Our upcoming virtual world for creators</li>
-                </ul>
               </div>
 
               {/* CTA Buttons */}
@@ -141,9 +130,309 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ========== WHAT WE'RE BUILDING - FULL WIDTH ========== */}
+      <section className="py-12 px-4 bg-gradient-to-b from-gray-800/50 to-gray-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              What We're <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Building</span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+              A comprehensive suite of AI-powered applications for every aspect of your personal and professional life
+            </p>
+          </div>
+
+          {/* App Categories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            
+            {/* Business Apps */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-blue-500/30 hover:border-blue-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Integrated Business Apps</h3>
+                  <span className="text-green-400 text-xs">Available Now</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Invoice & Quote Generator</li>
+                <li>• Proposal Builder</li>
+                <li>• Contract Creator</li>
+                <li>• Business Plan Writer</li>
+                <li>• Financial Reports</li>
+                <li>• Employee Handbook Generator</li>
+              </ul>
+            </motion.div>
+
+            {/* Creative Tools */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-pink-500/30 hover:border-pink-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center">
+                  <Palette className="w-6 h-6 text-pink-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Creative & Design Tools</h3>
+                  <span className="text-green-400 text-xs">Available Now</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Logo Creator</li>
+                <li>• Social Media Designer</li>
+                <li>• Presentation Builder</li>
+                <li>• Flyer & Poster Maker</li>
+                <li>• Business Card Designer</li>
+                <li>• Brand Kit Generator</li>
+              </ul>
+            </motion.div>
+
+            {/* Collectors & Hobby */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-amber-500/30 hover:border-amber-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                  <ShoppingBag className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Collectors & Hobby Apps</h3>
+                  <span className="text-yellow-400 text-xs">Coming Soon</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Collection Inventory Manager</li>
+                <li>• Price Guide & Valuation</li>
+                <li>• Trading Card Organizer</li>
+                <li>• Comic Book Catalog</li>
+                <li>• Vinyl Record Tracker</li>
+                <li>• Memorabilia Database</li>
+              </ul>
+            </motion.div>
+
+            {/* Travel Apps */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                  <Plane className="w-6 h-6 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Travel Related Apps</h3>
+                  <span className="text-yellow-400 text-xs">Coming Soon</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Trip Planner & Itinerary Builder</li>
+                <li>• Packing List Generator</li>
+                <li>• Travel Budget Calculator</li>
+                <li>• Flight & Hotel Comparison</li>
+                <li>• Travel Journal Creator</li>
+                <li>• Local Guide Generator</li>
+              </ul>
+            </motion.div>
+
+            {/* Real Estate Apps */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-green-500/30 hover:border-green-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <Home className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Real Estate Apps</h3>
+                  <span className="text-yellow-400 text-xs">Coming Soon</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Property Listing Generator</li>
+                <li>• Virtual Tour Creator</li>
+                <li>• Mortgage Calculator</li>
+                <li>• Rental Agreement Builder</li>
+                <li>• Property Comparison Tool</li>
+                <li>• Investment Analysis</li>
+              </ul>
+            </motion.div>
+
+            {/* Content Creation */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-purple-500/30 hover:border-purple-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Content Creation</h3>
+                  <span className="text-green-400 text-xs">Available Now</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Blog Post Writer</li>
+                <li>• Email Template Creator</li>
+                <li>• Newsletter Builder</li>
+                <li>• Resume & CV Generator</li>
+                <li>• Script Writer</li>
+                <li>• Course Content Creator</li>
+              </ul>
+            </motion.div>
+
+            {/* Media & Entertainment */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-red-500/30 hover:border-red-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Media & Entertainment</h3>
+                  <span className="text-yellow-400 text-xs">Coming Soon</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Video Script Generator</li>
+                <li>• Podcast Outline Creator</li>
+                <li>• YouTube Description Writer</li>
+                <li>• Thumbnail Designer</li>
+                <li>• Storyboard Creator</li>
+                <li>• Audio Visualizer</li>
+              </ul>
+            </motion.div>
+
+            {/* Games & Fun */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-indigo-500/30 hover:border-indigo-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                  <Gamepad2 className="w-6 h-6 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Games & Entertainment</h3>
+                  <span className="text-green-400 text-xs">Available Now</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Trivia Games</li>
+                <li>• Word Puzzles</li>
+                <li>• Memory Games</li>
+                <li>• Strategy Games</li>
+                <li>• Multiplayer Challenges</li>
+                <li>• Daily Brain Teasers</li>
+              </ul>
+            </motion.div>
+
+            {/* Developer Tools */}
+            <motion.div 
+              className="bg-gray-800/70 p-6 rounded-2xl border border-teal-500/30 hover:border-teal-500/60 transition-all"
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-teal-500/20 rounded-xl flex items-center justify-center">
+                  <Code className="w-6 h-6 text-teal-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Developer Tools</h3>
+                  <span className="text-green-400 text-xs">Available Now</span>
+                </div>
+              </div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• Code Generator</li>
+                <li>• API Documentation Writer</li>
+                <li>• Database Schema Designer</li>
+                <li>• README Creator</li>
+                <li>• Bug Report Generator</li>
+                <li>• Code Review Assistant</li>
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* Enhancement Request & Build Your Own */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Enhancement Request */}
+            <motion.div 
+              className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 p-6 rounded-2xl border border-yellow-500/30"
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-7 h-7 text-yellow-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-xl mb-2">Need Something We Don't Have?</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Submit an enhancement request and our community will vote on it! The most requested features 
+                    get prioritized for development. Your voice shapes what we build next.
+                  </p>
+                  <Link 
+                    href="/feature-request"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30 transition-all text-sm font-medium"
+                  >
+                    <Vote className="w-4 h-4" />
+                    Submit Enhancement Request
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Build Your Own */}
+            <motion.div 
+              className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 p-6 rounded-2xl border border-cyan-500/30"
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Rocket className="w-7 h-7 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-xl mb-2">Build Your Own App</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Want to create your own custom app, website, or tool? Sign up, select your plan, and work 
+                    directly with Javari to design and build it. We'll even host it for you!
+                  </p>
+                  <Link 
+                    href="/signup"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-all text-sm font-medium"
+                  >
+                    <Code className="w-4 h-4" />
+                    Start Building Now
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Hosting Callout */}
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-3 bg-gray-800/50 px-6 py-3 rounded-full border border-gray-700">
+              <Server className="w-5 h-5 text-green-400" />
+              <span className="text-gray-300">
+                <strong className="text-white">Full Hosting Available</strong> — Deploy your apps, websites, and tools directly on our platform
+              </span>
+              <Globe className="w-5 h-5 text-blue-400" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Coming Soon Section - Only shows if projects marked in admin */}
       {comingSoonProjects.length > 0 && (
-        <section className="py-10 px-4 bg-gray-800/30">
+        <section className="py-10 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-6">
               <span className="inline-block px-4 py-1 bg-purple-500/20 text-purple-400 text-sm font-medium rounded-full mb-3">
