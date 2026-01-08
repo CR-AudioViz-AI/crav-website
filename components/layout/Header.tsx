@@ -1,19 +1,13 @@
 'use client';
 
 /**
- * CR AudioViz AI - HEADER COMPONENT (FINAL LOCK)
+ * CR AudioViz AI - HEADER COMPONENT (FIXED LAYOUT)
  * 
- * UNIFIED SYSTEM: Header + CR Bar + Credits Bar
- * - Light teal background (logo-safe)
- * - All bars same color family
- * - Subtle separators only
- * - Logo dominates
- * - Nav: navy text, teal hover/active
- * - Sign Up: teal (not red)
- * - Cindy & Roy: RED
+ * FIX: Nav links centered, auth section visible on right
+ * - Three-column layout: Logo | Nav (centered) | Auth
+ * - Prevents auth section from being pushed off-screen
  * 
- * DO NOT MODIFY AFTER LOCK
- * @timestamp January 8, 2026 - FINAL
+ * @timestamp January 8, 2026 - LAYOUT FIX
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -130,34 +124,32 @@ export default function Header() {
 
   const displayPhrase = showCindyRoy ? "Cindy & Roy" : CR_PHRASES[currentPhraseIndex];
 
-  // UNIFIED HEADER SYSTEM - Same light teal family throughout
   return (
     <header className="bg-cyan-50 border-b border-cyan-100" data-testid="site-header">
-      {/* MAIN HEADER BAR */}
-      <div className="h-[76px] md:h-[84px] flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          
-          {/* Logo - DOMINATES header, increased ~15% */}
-          <Link 
-            href="/" 
-            data-testid="header-logo" 
-            aria-label="CR AudioViz AI Home"
-            className="flex-shrink-0 w-[240px] md:w-[320px] lg:w-[380px] flex items-center px-2"
-          >
-            <Image
-              src="/craudiovizailogo.png"
-              alt="CR AudioViz AI"
-              width={274}
-              height={72}
-              className="h-[48px] md:h-[56px] lg:h-[60px] w-auto max-w-full block"
-              priority
-            />
-          </Link>
+      {/* MAIN HEADER BAR - Fixed 3-column grid layout */}
+      <div className="h-[76px] md:h-[84px]">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          {/* 3-column grid: Logo | Nav (centered) | Auth */}
+          <div className="hidden lg:grid grid-cols-[auto_1fr_auto] items-center h-full gap-4">
+            {/* Column 1: Logo (left) */}
+            <Link 
+              href="/" 
+              data-testid="header-logo" 
+              aria-label="CR AudioViz AI Home"
+              className="flex-shrink-0 flex items-center"
+            >
+              <Image
+                src="/craudiovizailogo.png"
+                alt="CR AudioViz AI"
+                width={274}
+                height={72}
+                className="h-[56px] lg:h-[60px] w-auto max-w-full block"
+                priority
+              />
+            </Link>
 
-          {/* Right side: Nav + Auth */}
-          <div className="flex flex-col items-end gap-1">
-            {/* Desktop Navigation - Navy text, teal hover/active */}
-            <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
+            {/* Column 2: Navigation (centered) */}
+            <nav className="flex items-center justify-center space-x-1" data-testid="desktop-nav">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.id}
@@ -173,26 +165,65 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Auth Section */}
-            <div className="flex items-center gap-2" data-testid="auth-section">
+            {/* Column 3: Auth Section (right) */}
+            <div className="flex items-center gap-3 flex-shrink-0" data-testid="auth-section">
               {loading ? (
-                <div className="w-16 h-7 bg-cyan-100 rounded animate-pulse" />
+                <div className="w-20 h-8 bg-cyan-100 rounded animate-pulse" />
               ) : user ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-700 hover:text-cyan-600">
                     <User className="w-4 h-4" />
-                    <span className="hidden sm:inline">{getDisplayName()}</span>
+                    <span>{getDisplayName()}</span>
                   </Link>
-                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500 hover:text-cyan-600">
+                  <button onClick={handleSignOut} className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-500 hover:text-cyan-600">
                     <LogOut className="w-4 h-4" />
-                    <span className="hidden sm:inline">Logout</span>
+                    <span>Logout</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login" className="px-3 py-1 text-sm text-slate-700 hover:text-cyan-600">Log In</Link>
-                  {/* Sign Up = TEAL (not red) */}
                   <Link href="/signup" className="px-3 py-1.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-lg text-sm font-medium">Sign Up</Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile/Tablet header - simpler 2-column */}
+          <div className="lg:hidden flex items-center justify-between h-full">
+            <Link 
+              href="/" 
+              aria-label="CR AudioViz AI Home"
+              className="flex-shrink-0"
+            >
+              <Image
+                src="/craudiovizailogo.png"
+                alt="CR AudioViz AI"
+                width={274}
+                height={72}
+                className="h-[48px] md:h-[56px] w-auto"
+                priority
+              />
+            </Link>
+
+            {/* Mobile Auth */}
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <div className="w-16 h-7 bg-cyan-100 rounded animate-pulse" />
+              ) : user ? (
+                <div className="flex items-center gap-2">
+                  <Link href="/dashboard" className="flex items-center gap-1 px-2 py-1 text-sm text-slate-700">
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{getDisplayName()}</span>
+                  </Link>
+                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500">
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/login" className="px-2 py-1 text-sm text-slate-700">Log In</Link>
+                  <Link href="/signup" className="px-2 py-1 bg-cyan-600 text-white rounded text-sm font-medium">Sign Up</Link>
                 </div>
               )}
             </div>
@@ -200,19 +231,18 @@ export default function Header() {
         </div>
       </div>
 
-      {/* CR = BAR - SAME background family, subtle separator */}
+      {/* CR = BAR - Centered */}
       <div className="flex justify-center py-1.5 bg-cyan-50 border-t border-cyan-100/50">
         <div className="flex items-center gap-2 text-slate-700 text-sm">
           <span className="font-bold text-cyan-600">CR</span>
           <span className="text-slate-400">=</span>
-          {/* Cindy & Roy = RED (action color exception) */}
           <span className={`transition-all duration-300 ${showCindyRoy ? 'text-red-500 font-bold' : ''}`}>
             {displayPhrase}
           </span>
         </div>
       </div>
 
-      {/* CREDITS BAR - SAME background, only shows when logged in */}
+      {/* CREDITS BAR - Only shows when logged in */}
       {user && (
         <div className="bg-cyan-50 border-t border-cyan-100/50 py-1">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -233,7 +263,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* Mobile Navigation - Same color family */}
+      {/* Mobile Navigation - Centered */}
       <div className="lg:hidden border-t border-cyan-100 bg-cyan-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 py-1.5 overflow-x-auto scrollbar-hide">
