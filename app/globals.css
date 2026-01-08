@@ -76,27 +76,6 @@
   --z-modal-backdrop: 300;
   --z-modal: 400;
   --z-tooltip: 500;
-  
-  /* Theme Colors (Light Mode Default) */
-  --app-bg: #ffffff;
-  --app-text: #0f172a;
-  --app-bg-secondary: #f8fafc;
-  --app-border: #e2e8f0;
-}
-
-/* ============================================
-   DARK MODE - Theme Override
-   ============================================ */
-.dark {
-  --app-bg: #0b1220;
-  --app-text: #e2e8f0;
-  --app-bg-secondary: #1e293b;
-  --app-border: #334155;
-  
-  /* Dark mode shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
 }
 
 /* ============================================
@@ -124,10 +103,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Theme colors */
-  background-color: var(--app-bg);
-  color: var(--app-text);
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Prevent pull-to-refresh on mobile when not needed */
