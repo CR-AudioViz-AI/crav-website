@@ -1,14 +1,13 @@
 'use client';
 
 /**
- * CR AudioViz AI - HEADER COMPONENT (FIXED LAYOUT + THEME TOGGLE)
+ * CR AudioViz AI - HEADER COMPONENT (FIXED LAYOUT)
  * 
  * FIX: Nav links centered, auth section visible on right
  * - Three-column layout: Logo | Nav (centered) | Auth
  * - Prevents auth section from being pushed off-screen
- * - Includes ThemeToggle for dark mode switching
  * 
- * @timestamp January 8, 2026 - LAYOUT FIX + DARK MODE
+ * @timestamp January 8, 2026 - LAYOUT FIX
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,7 +16,6 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { User, LogOut, Sparkles, Zap } from 'lucide-react';
-import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const NAV_LINKS = [
   { id: 'home', href: '/', label: 'Home' },
@@ -127,7 +125,7 @@ export default function Header() {
   const displayPhrase = showCindyRoy ? "Cindy & Roy" : CR_PHRASES[currentPhraseIndex];
 
   return (
-    <header className="bg-cyan-50 dark:bg-slate-900 border-b border-cyan-100 dark:border-slate-800" data-testid="site-header">
+    <header className="bg-cyan-50 border-b border-cyan-100" data-testid="site-header">
       {/* MAIN HEADER BAR - Fixed 3-column grid layout */}
       <div className="h-[76px] md:h-[84px]">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -156,10 +154,10 @@ export default function Header() {
                 <Link
                   key={link.id}
                   href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive(link.href)
-                      ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 border-b-2 border-cyan-500'
-                      : 'text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-800'
+                      ? 'bg-cyan-100 text-cyan-700 border-b-2 border-cyan-500'
+                      : 'text-slate-700 hover:text-cyan-600 hover:bg-cyan-50'
                   }`}
                 >
                   {link.label}
@@ -167,25 +165,24 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Column 3: Auth Section + Theme Toggle (right) */}
+            {/* Column 3: Auth Section (right) */}
             <div className="flex items-center gap-3 flex-shrink-0" data-testid="auth-section">
-              <ThemeToggle />
               {loading ? (
-                <div className="w-20 h-8 bg-cyan-100 dark:bg-slate-800 rounded animate-pulse" />
+                <div className="w-20 h-8 bg-cyan-100 rounded animate-pulse" />
               ) : user ? (
                 <div className="flex items-center gap-3">
-                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400">
+                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-700 hover:text-cyan-600">
                     <User className="w-4 h-4" />
                     <span>{getDisplayName()}</span>
                   </Link>
-                  <button onClick={handleSignOut} className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">
+                  <button onClick={handleSignOut} className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-500 hover:text-cyan-600">
                     <LogOut className="w-4 h-4" />
                     <span>Logout</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" className="px-3 py-1 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400">Log In</Link>
+                  <Link href="/login" className="px-3 py-1 text-sm text-slate-700 hover:text-cyan-600">Log In</Link>
                   <Link href="/signup" className="px-3 py-1.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-lg text-sm font-medium">Sign Up</Link>
                 </div>
               )}
@@ -209,24 +206,23 @@ export default function Header() {
               />
             </Link>
 
-            {/* Mobile Auth + Theme */}
+            {/* Mobile Auth */}
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               {loading ? (
-                <div className="w-16 h-7 bg-cyan-100 dark:bg-slate-800 rounded animate-pulse" />
+                <div className="w-16 h-7 bg-cyan-100 rounded animate-pulse" />
               ) : user ? (
                 <div className="flex items-center gap-2">
-                  <Link href="/dashboard" className="flex items-center gap-1 px-2 py-1 text-sm text-slate-700 dark:text-slate-300">
+                  <Link href="/dashboard" className="flex items-center gap-1 px-2 py-1 text-sm text-slate-700">
                     <User className="w-4 h-4" />
                     <span className="hidden sm:inline">{getDisplayName()}</span>
                   </Link>
-                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
+                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500">
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" className="px-2 py-1 text-sm text-slate-700 dark:text-slate-300">Log In</Link>
+                  <Link href="/login" className="px-2 py-1 text-sm text-slate-700">Log In</Link>
                   <Link href="/signup" className="px-2 py-1 bg-cyan-600 text-white rounded text-sm font-medium">Sign Up</Link>
                 </div>
               )}
@@ -236,10 +232,10 @@ export default function Header() {
       </div>
 
       {/* CR = BAR - Centered */}
-      <div className="flex justify-center py-1.5 bg-cyan-50 dark:bg-slate-900 border-t border-cyan-100/50 dark:border-slate-800/50">
-        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-sm">
-          <span className="font-bold text-cyan-600 dark:text-cyan-400">CR</span>
-          <span className="text-slate-400 dark:text-slate-500">=</span>
+      <div className="flex justify-center py-1.5 bg-cyan-50 border-t border-cyan-100/50">
+        <div className="flex items-center gap-2 text-slate-700 text-sm">
+          <span className="font-bold text-cyan-600">CR</span>
+          <span className="text-slate-400">=</span>
           <span className={`transition-all duration-300 ${showCindyRoy ? 'text-red-500 font-bold' : ''}`}>
             {displayPhrase}
           </span>
@@ -248,18 +244,18 @@ export default function Header() {
 
       {/* CREDITS BAR - Only shows when logged in */}
       {user && (
-        <div className="bg-cyan-50 dark:bg-slate-900 border-t border-cyan-100/50 dark:border-slate-800/50 py-1">
+        <div className="bg-cyan-50 border-t border-cyan-100/50 py-1">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center gap-3 text-xs">
               <span className={`px-2 py-0.5 rounded-full ${
-                isAdmin ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300' :
-                plan === 'Pro' ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                isAdmin ? 'bg-cyan-100 text-cyan-700' :
+                plan === 'Pro' ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600'
               }`}>
                 <Sparkles className="w-3 h-3 inline mr-1" />
                 {isAdmin ? 'Admin' : plan}
               </span>
-              <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
-                <Zap className="w-3 h-3 text-cyan-500 dark:text-cyan-400" />
+              <span className="flex items-center gap-1 text-slate-600">
+                <Zap className="w-3 h-3 text-cyan-500" />
                 {isAdmin ? 'Unlimited credits' : `${credits?.toLocaleString()} credits`}
               </span>
             </div>
@@ -268,7 +264,7 @@ export default function Header() {
       )}
 
       {/* Mobile Navigation - Centered */}
-      <div className="lg:hidden border-t border-cyan-100 dark:border-slate-800 bg-cyan-50 dark:bg-slate-900">
+      <div className="lg:hidden border-t border-cyan-100 bg-cyan-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 py-1.5 overflow-x-auto scrollbar-hide">
             {NAV_LINKS.slice(0, 6).map((link) => (
@@ -276,13 +272,13 @@ export default function Header() {
                 key={link.id}
                 href={link.href}
                 className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap transition-colors ${
-                  isActive(link.href) ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300' : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
+                  isActive(link.href) ? 'bg-cyan-100 text-cyan-700' : 'text-slate-600 hover:text-cyan-600'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <Link href="/about" className="px-2 py-1 rounded text-xs font-medium whitespace-nowrap text-slate-500 dark:text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400">
+            <Link href="/about" className="px-2 py-1 rounded text-xs font-medium whitespace-nowrap text-slate-500 hover:text-cyan-600">
               More...
             </Link>
           </div>
