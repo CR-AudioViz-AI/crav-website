@@ -3,8 +3,10 @@
 /**
  * CR AudioViz AI - HEADER COMPONENT
  * 
- * - LARGE rectangular logo (TWICE as big, rectangle container)
- * - CR = CENTERED on page
+ * FIXED HEIGHT header with properly sized logo
+ * - Header: 72px mobile / 88px desktop (LOCKED)
+ * - Logo: fits inside header, width-emphasized for readability
+ * - No vertical padding inflation
  * 
  * @timestamp January 8, 2026
  */
@@ -137,28 +139,30 @@ export default function Header() {
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-green-600" data-testid="site-header">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1: LARGE Logo + Nav + Auth */}
-        <div className="flex items-center justify-between py-3 md:py-4">
-          {/* Logo - RECTANGLE, TWICE AS BIG */}
+      {/* MAIN NAV BAR - FIXED HEIGHT: 72px mobile / 88px desktop */}
+      <div className="h-[72px] md:h-[88px] flex items-center overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          
+          {/* Logo - Width-emphasized for readability */}
           <Link 
             href="/" 
             data-testid="header-logo" 
             aria-label="CR AudioViz AI Home"
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-full max-w-[260px] md:max-w-[340px] flex items-center"
           >
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
               width={400}
               height={100}
-              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto"
+              className="h-[52px] md:h-[64px] w-auto object-contain"
+              sizes="(max-width: 768px) 260px, 340px"
               priority
             />
           </Link>
 
-          {/* Right side: Nav + Auth stacked */}
-          <div className="flex flex-col items-end gap-2">
+          {/* Right side: Nav + Auth */}
+          <div className="flex flex-col items-end gap-1">
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
               {NAV_LINKS.map((link) => (
@@ -177,33 +181,17 @@ export default function Header() {
             </nav>
 
             {/* Auth Section */}
-            <div className="flex flex-col items-end gap-0">
-              <div className="flex items-center gap-2" data-testid="auth-section">
-                {loading ? (
-                  <div className="w-16 h-7 bg-white/20 rounded animate-pulse" />
-                ) : user ? (
-                  <div className="flex items-center gap-2">
-                    <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-white/90 hover:text-white">
-                      <User className="w-4 h-4" />
-                      <span className="hidden sm:inline">{getDisplayName()}</span>
-                    </Link>
-                    <span className="text-white/40 hidden sm:inline">|</span>
-                    <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-white/70 hover:text-white">
-                      <LogOut className="w-4 h-4" />
-                      <span className="hidden sm:inline">Logout</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Link href="/login" className="px-3 py-1 text-sm text-white/90 hover:text-white">Log In</Link>
-                    <Link href="/signup" className="px-3 py-1.5 bg-white text-blue-600 hover:bg-white/90 rounded-lg text-sm font-medium">Sign Up</Link>
-                  </div>
-                )}
-              </div>
-              {/* Plan details */}
-              <div className="text-[11px] mt-0.5">
-                {!loading && (user ? (
-                  <div className="flex items-center gap-1.5 text-white/80">
+            <div className="flex items-center gap-2" data-testid="auth-section">
+              {loading ? (
+                <div className="w-16 h-7 bg-white/20 rounded animate-pulse" />
+              ) : user ? (
+                <div className="flex items-center gap-2">
+                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-white/90 hover:text-white">
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{getDisplayName()}</span>
+                  </Link>
+                  <span className="text-white/40 hidden sm:inline">|</span>
+                  <div className="hidden sm:flex items-center gap-1.5 text-white/80 text-[11px]">
                     <span className={`px-1.5 py-0.5 rounded-full ${
                       isAdmin ? 'bg-yellow-500/30 text-yellow-200' :
                       plan === 'Pro' ? 'bg-purple-500/30 text-purple-200' : 'bg-white/20'
@@ -216,23 +204,32 @@ export default function Header() {
                       {isAdmin ? 'Unlimited' : `${credits?.toLocaleString()} credits`}
                     </span>
                   </div>
-                ) : (
-                  <span className="text-white/60">Log in to see your plan details</span>
-                ))}
-              </div>
+                  <span className="text-white/40 hidden sm:inline">|</span>
+                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-white/70 hover:text-white">
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="text-white/60 text-[11px] hidden sm:inline">Log in to see your plan</span>
+                  <Link href="/login" className="px-3 py-1 text-sm text-white/90 hover:text-white">Log In</Link>
+                  <Link href="/signup" className="px-3 py-1.5 bg-white text-blue-600 hover:bg-white/90 rounded-lg text-sm font-medium">Sign Up</Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Row 2: CR = CENTERED on page */}
-        <div className="flex justify-center pb-2">
-          <div className="flex items-center gap-2 text-white text-sm">
-            <span className="font-bold text-cyan-300">CR</span>
-            <span className="text-white/60">=</span>
-            <span className={`transition-all duration-300 ${showCindyRoy ? 'text-pink-300 font-bold' : ''}`}>
-              {displayPhrase}
-            </span>
-          </div>
+      {/* CR = phrase bar */}
+      <div className="flex justify-center py-1.5 border-t border-white/10">
+        <div className="flex items-center gap-2 text-white text-sm">
+          <span className="font-bold text-cyan-300">CR</span>
+          <span className="text-white/60">=</span>
+          <span className={`transition-all duration-300 ${showCindyRoy ? 'text-pink-300 font-bold' : ''}`}>
+            {displayPhrase}
+          </span>
         </div>
       </div>
 
