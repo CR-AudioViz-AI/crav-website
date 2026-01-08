@@ -3,8 +3,9 @@
 /**
  * CR AudioViz AI - FOOTER COMPONENT
  * 
- * VERY compact - minimal spacing between rows
- * Single line height, tight gaps
+ * - Very compact spacing
+ * - Bottom bar has SAME gradient as header (blue to green)
+ * - Consistent branding throughout
  * 
  * @timestamp January 8, 2026
  */
@@ -42,7 +43,7 @@ export function Footer() {
 
   return (
     <footer className="bg-slate-950 border-t border-white/10" data-testid="site-footer">
-      {/* Main Footer - VERY tight spacing */}
+      {/* Main Footer - tight spacing */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
           
@@ -57,7 +58,7 @@ export function Footer() {
             <p className="text-gray-500 text-[11px] leading-tight">AI-powered creative tools.</p>
           </div>
 
-          {/* Navigation - TIGHT rows */}
+          {/* Navigation */}
           <div>
             <h3 className="text-white font-semibold text-[11px] mb-1">Navigation</h3>
             <ul className="space-y-0">
@@ -71,7 +72,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support - TIGHT rows */}
+          {/* Support */}
           <div>
             <h3 className="text-white font-semibold text-[11px] mb-1">Support</h3>
             <ul className="space-y-0">
@@ -85,7 +86,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal - TIGHT rows */}
+          {/* Legal */}
           <div>
             <h3 className="text-white font-semibold text-[11px] mb-1">Legal</h3>
             <ul className="space-y-0">
@@ -101,12 +102,12 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Copyright - minimal */}
-      <div className="bg-slate-900/50 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-0.5 text-center sm:text-left">
-            <p className="text-gray-500 text-[10px]">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
-            <p className="text-gray-600 text-[10px]">Made with ❤️ in Fort Myers, Florida</p>
+      {/* Bottom Bar - SAME GRADIENT AS HEADER */}
+      <div className="bg-gradient-to-r from-blue-600 to-green-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
+            <p className="text-white/90 text-[11px]">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
+            <p className="text-white/70 text-[11px]">Made with ❤️ in Fort Myers, Florida</p>
           </div>
         </div>
       </div>
