@@ -1,8 +1,11 @@
 /**
- * CR AudioViz AI - Root Layout
+ * CR AudioViz AI - Root Layout (FIXED)
  * 
- * Structure: Header (with CR bar integrated) > Content > Footer
- * No separate TopBar - it's now part of Header
+ * FOOTER SPACING FIX:
+ * - Body is the flex container (not a wrapper div)
+ * - Header inside the flex flow with sticky positioning
+ * - Main uses flex-1 to take remaining space
+ * - Footer has margin-top: auto as fallback
  * 
  * @timestamp January 8, 2026
  */
@@ -89,19 +92,29 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={inter.className}>
+      {/* 
+        FOOTER SPACING FIX:
+        - Body is min-h-screen flex flex-col
+        - Header is sticky but inside the flex flow
+        - Main is flex-1 (takes remaining space)
+        - Footer stays at bottom naturally
+      */}
+      <body className={`${inter.className} min-h-screen flex flex-col`}>
         <CanonicalLink />
-        {/* Sticky header - CR bar is now integrated into Header */}
-        <div className="sticky top-0 z-50">
-          <Header />
-        </div>
-        <div className="min-h-screen flex flex-col">
-          <main className="flex-grow">
-            {children}
-          </main>
-          <SocialMediaButtons />
-          <Footer />
-        </div>
+        
+        {/* Sticky header - inside the flex container */}
+        <Header />
+        
+        {/* Main content - flex-1 takes all available space */}
+        <main className="flex-1">
+          {children}
+        </main>
+        
+        {/* Social + Footer - pushed to bottom by flex-1 main */}
+        <SocialMediaButtons />
+        <Footer />
+        
+        {/* Widget overlay */}
         <JavariWidget />
       </body>
     </html>
