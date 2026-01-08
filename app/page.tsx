@@ -45,10 +45,6 @@ export default function LandingPage() {
                   height={240}
                   className="relative rounded-full border-3 border-cyan-400 shadow-xl shadow-cyan-500/30"
                 />
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1.5 rounded-full font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  Javari AI - Online
-                </div>
               </div>
             </motion.div>
 
