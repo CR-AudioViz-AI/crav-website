@@ -3,11 +3,10 @@
 /**
  * CR AudioViz AI - HEADER COMPONENT
  * 
- * Gradient header matching TopBar (blue-to-green)
- * - Logo on left
+ * Gradient header (blue-to-green)
+ * - Logo on left (no box/outline)
  * - Navigation links
  * - Auth section
- * - No hamburger menu (removed non-functional)
  * 
  * @timestamp January 8, 2026
  */
@@ -98,13 +97,13 @@ export default function Header() {
 
   return (
     <header 
-      className="bg-gradient-to-r from-blue-600 to-green-600 border-b border-white/20"
+      className="bg-gradient-to-r from-blue-600 to-green-600"
       data-testid="site-header"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
-          {/* Logo */}
+          {/* Logo - NO box/outline, just the image */}
           <Link 
             href="/" 
             className="flex items-center flex-shrink-0"
@@ -114,9 +113,9 @@ export default function Header() {
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
-              width={160}
-              height={160}
-              className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px]"
+              width={180}
+              height={50}
+              className="h-10 sm:h-12 md:h-14 w-auto"
               priority
             />
           </Link>
