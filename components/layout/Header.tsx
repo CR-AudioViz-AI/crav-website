@@ -1,15 +1,19 @@
 'use client';
 
 /**
- * CR AudioViz AI - HEADER COMPONENT
+ * CR AudioViz AI - HEADER COMPONENT (FINAL LOCK)
  * 
- * LIGHT BACKGROUND for logo legibility (per founder directive)
- * - Header: 76px mobile / 84px desktop (REDUCED)
- * - Logo wrapper: 220px / 300px / 360px
- * - Logo: 44px / 52px / 56px
- * - Cindy & Roy = RED letters
+ * UNIFIED SYSTEM: Header + CR Bar + Credits Bar
+ * - Light teal background (logo-safe)
+ * - All bars same color family
+ * - Subtle separators only
+ * - Logo dominates
+ * - Nav: navy text, teal hover/active
+ * - Sign Up: teal (not red)
+ * - Cindy & Roy: RED
  * 
- * @timestamp January 8, 2026
+ * DO NOT MODIFY AFTER LOCK
+ * @timestamp January 8, 2026 - FINAL
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -46,18 +50,6 @@ const CR_PHRASES = [
   "Creative Reach", "Crisp Resolution", "Critical Reviews", "Crowning Rewards",
   "Crucial Resources", "Cumulative Returns", "Curious Readers", "Current Relevance",
   "Custom Requests", "Cybernetic Realms", "Calculated Risks", "Calm Reflection",
-  "Candid Reviews", "Capital Returns", "Captive Results", "Cardinal Rules",
-  "Careful Research", "Cascading Results", "Casual Reading", "Catalytic Reactions",
-  "Centered Reality", "Challenging Routes", "Changing Reality", "Character Recognition",
-  "Charitable Reach", "Checked References", "Chemical Reactions", "Chief Researchers",
-  "Circular Reasoning", "Civic Responsibility", "Classic Renditions", "Clean Records",
-  "Climbing Rankings", "Clinical Research", "Closed Rounds", "Coached Results",
-  "Coastal Routes", "Cognitive Research", "Collective Resources", "Colonial Routes",
-  "Comfortable Rhythms", "Commercial Reality", "Common Resources", "Compact Results",
-  "Competitive Rates", "Complex Relations", "Computed Results", "Conceptual Reasoning",
-  "Concrete Results", "Conditional Returns", "Confirmed Reports", "Conscious Reasoning",
-  "Constant Reliability", "Consumer Reports", "Contemporary Research", "Contextual Relevance",
-  "Controlled Reactions", "Conventional Routes", "Cooperative Relations", "Coordinated Response",
 ];
 
 export default function Header() {
@@ -138,32 +130,33 @@ export default function Header() {
 
   const displayPhrase = showCindyRoy ? "Cindy & Roy" : CR_PHRASES[currentPhraseIndex];
 
+  // UNIFIED HEADER SYSTEM - Same light teal family throughout
   return (
-    <header className="bg-gradient-to-r from-sky-100 to-teal-100 border-b border-gray-200" data-testid="site-header">
-      {/* MAIN NAV BAR - REDUCED HEIGHT: 76px mobile / 84px desktop */}
+    <header className="bg-cyan-50 border-b border-cyan-100" data-testid="site-header">
+      {/* MAIN HEADER BAR */}
       <div className="h-[76px] md:h-[84px] flex items-center">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           
-          {/* Logo wrapper - REDUCED WIDTH */}
+          {/* Logo - DOMINATES header, increased ~15% */}
           <Link 
             href="/" 
             data-testid="header-logo" 
             aria-label="CR AudioViz AI Home"
-            className="flex-shrink-0 w-[220px] md:w-[300px] lg:w-[360px] flex items-center"
+            className="flex-shrink-0 w-[240px] md:w-[320px] lg:w-[380px] flex items-center px-2"
           >
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
               width={274}
               height={72}
-              className="h-[44px] md:h-[52px] lg:h-[56px] w-auto max-w-full block"
+              className="h-[48px] md:h-[56px] lg:h-[60px] w-auto max-w-full block"
               priority
             />
           </Link>
 
           {/* Right side: Nav + Auth */}
           <div className="flex flex-col items-end gap-1">
-            {/* Desktop Navigation - Navy text on light background */}
+            {/* Desktop Navigation - Navy text, teal hover/active */}
             <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
               {NAV_LINKS.map((link) => (
                 <Link
@@ -171,8 +164,8 @@ export default function Header() {
                   href={link.href}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive(link.href)
-                      ? 'bg-teal-500/20 text-teal-700 border-b-2 border-teal-500'
-                      : 'text-slate-700 hover:text-teal-600 hover:bg-teal-500/10'
+                      ? 'bg-cyan-100 text-cyan-700 border-b-2 border-cyan-500'
+                      : 'text-slate-700 hover:text-cyan-600 hover:bg-cyan-50'
                   }`}
                 >
                   {link.label}
@@ -180,41 +173,26 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Auth Section - Navy/charcoal text */}
+            {/* Auth Section */}
             <div className="flex items-center gap-2" data-testid="auth-section">
               {loading ? (
-                <div className="w-16 h-7 bg-slate-200 rounded animate-pulse" />
+                <div className="w-16 h-7 bg-cyan-100 rounded animate-pulse" />
               ) : user ? (
                 <div className="flex items-center gap-2">
-                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-700 hover:text-teal-600">
+                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-700 hover:text-cyan-600">
                     <User className="w-4 h-4" />
                     <span className="hidden sm:inline">{getDisplayName()}</span>
                   </Link>
-                  <span className="text-slate-300 hidden sm:inline">|</span>
-                  <div className="hidden sm:flex items-center gap-1.5 text-slate-600 text-[11px]">
-                    <span className={`px-1.5 py-0.5 rounded-full ${
-                      isAdmin ? 'bg-yellow-100 text-yellow-700' :
-                      plan === 'Pro' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      <Sparkles className="w-3 h-3 inline mr-0.5" />
-                      {isAdmin ? 'Admin' : plan}
-                    </span>
-                    <span className="flex items-center gap-0.5">
-                      <Zap className="w-3 h-3" />
-                      {isAdmin ? 'Unlimited' : `${credits?.toLocaleString()} credits`}
-                    </span>
-                  </div>
-                  <span className="text-slate-300 hidden sm:inline">|</span>
-                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500 hover:text-teal-600">
+                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500 hover:text-cyan-600">
                     <LogOut className="w-4 h-4" />
                     <span className="hidden sm:inline">Logout</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-500 text-[11px] hidden sm:inline">Log in to see your plan</span>
-                  <Link href="/login" className="px-3 py-1 text-sm text-slate-700 hover:text-teal-600">Log In</Link>
-                  <Link href="/signup" className="px-3 py-1.5 bg-teal-500 text-white hover:bg-teal-600 rounded-lg text-sm font-medium">Sign Up</Link>
+                  <Link href="/login" className="px-3 py-1 text-sm text-slate-700 hover:text-cyan-600">Log In</Link>
+                  {/* Sign Up = TEAL (not red) */}
+                  <Link href="/signup" className="px-3 py-1.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-lg text-sm font-medium">Sign Up</Link>
                 </div>
               )}
             </div>
@@ -222,20 +200,41 @@ export default function Header() {
         </div>
       </div>
 
-      {/* CR = phrase bar - light teal background */}
-      <div className="flex justify-center py-1.5 bg-teal-50 border-t border-teal-100">
+      {/* CR = BAR - SAME background family, subtle separator */}
+      <div className="flex justify-center py-1.5 bg-cyan-50 border-t border-cyan-100/50">
         <div className="flex items-center gap-2 text-slate-700 text-sm">
-          <span className="font-bold text-teal-600">CR</span>
+          <span className="font-bold text-cyan-600">CR</span>
           <span className="text-slate-400">=</span>
-          {/* Cindy & Roy in RED (not pink) */}
+          {/* Cindy & Roy = RED (action color exception) */}
           <span className={`transition-all duration-300 ${showCindyRoy ? 'text-red-500 font-bold' : ''}`}>
             {displayPhrase}
           </span>
         </div>
       </div>
 
-      {/* Mobile Navigation - navy text on light */}
-      <div className="lg:hidden border-t border-gray-200 bg-white/50">
+      {/* CREDITS BAR - SAME background, only shows when logged in */}
+      {user && (
+        <div className="bg-cyan-50 border-t border-cyan-100/50 py-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center gap-3 text-xs">
+              <span className={`px-2 py-0.5 rounded-full ${
+                isAdmin ? 'bg-cyan-100 text-cyan-700' :
+                plan === 'Pro' ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600'
+              }`}>
+                <Sparkles className="w-3 h-3 inline mr-1" />
+                {isAdmin ? 'Admin' : plan}
+              </span>
+              <span className="flex items-center gap-1 text-slate-600">
+                <Zap className="w-3 h-3 text-cyan-500" />
+                {isAdmin ? 'Unlimited credits' : `${credits?.toLocaleString()} credits`}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Navigation - Same color family */}
+      <div className="lg:hidden border-t border-cyan-100 bg-cyan-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 py-1.5 overflow-x-auto scrollbar-hide">
             {NAV_LINKS.slice(0, 6).map((link) => (
@@ -243,13 +242,13 @@ export default function Header() {
                 key={link.id}
                 href={link.href}
                 className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap transition-colors ${
-                  isActive(link.href) ? 'bg-teal-500/20 text-teal-700' : 'text-slate-600 hover:text-teal-600 hover:bg-teal-500/10'
+                  isActive(link.href) ? 'bg-cyan-100 text-cyan-700' : 'text-slate-600 hover:text-cyan-600'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <Link href="/about" className="px-2 py-1 rounded text-xs font-medium whitespace-nowrap text-slate-500 hover:text-teal-600 hover:bg-teal-500/10">
+            <Link href="/about" className="px-2 py-1 rounded text-xs font-medium whitespace-nowrap text-slate-500 hover:text-cyan-600">
               More...
             </Link>
           </div>
