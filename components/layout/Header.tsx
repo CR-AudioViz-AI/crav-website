@@ -3,7 +3,7 @@
 /**
  * CR AudioViz AI - HEADER COMPONENT
  * 
- * - Properly sized logo (readable but proportionate)
+ * - LARGE rectangular logo (TWICE as big, rectangle container)
  * - CR = CENTERED on page
  * 
  * @timestamp January 8, 2026
@@ -138,9 +138,9 @@ export default function Header() {
   return (
     <header className="bg-gradient-to-r from-blue-600 to-green-600" data-testid="site-header">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1: Properly sized Logo + Nav + Auth */}
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo - Readable but proportionate */}
+        {/* Row 1: LARGE Logo + Nav + Auth */}
+        <div className="flex items-center justify-between py-3 md:py-4">
+          {/* Logo - RECTANGLE, TWICE AS BIG */}
           <Link 
             href="/" 
             data-testid="header-logo" 
@@ -150,73 +150,76 @@ export default function Header() {
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
-              width={320}
-              height={80}
-              className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto"
+              width={400}
+              height={100}
+              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto"
               priority
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.id}
-                href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(link.href)
-                    ? 'bg-white/25 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/15'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Auth Section */}
-          <div className="flex flex-col items-end gap-0">
-            <div className="flex items-center gap-2" data-testid="auth-section">
-              {loading ? (
-                <div className="w-16 h-7 bg-white/20 rounded animate-pulse" />
-              ) : user ? (
-                <div className="flex items-center gap-2">
-                  <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-white/90 hover:text-white">
-                    <User className="w-4 h-4" />
-                    <span className="hidden sm:inline">{getDisplayName()}</span>
-                  </Link>
-                  <span className="text-white/40 hidden sm:inline">|</span>
-                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-white/70 hover:text-white">
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden sm:inline">Logout</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/login" className="px-3 py-1 text-sm text-white/90 hover:text-white">Log In</Link>
-                  <Link href="/signup" className="px-3 py-1.5 bg-white text-blue-600 hover:bg-white/90 rounded-lg text-sm font-medium">Sign Up</Link>
-                </div>
-              )}
-            </div>
-            {/* Plan details - compact */}
-            <div className="text-[11px] mt-0.5">
-              {!loading && (user ? (
-                <div className="flex items-center gap-1.5 text-white/80">
-                  <span className={`px-1.5 py-0.5 rounded-full ${
-                    isAdmin ? 'bg-yellow-500/30 text-yellow-200' :
-                    plan === 'Pro' ? 'bg-purple-500/30 text-purple-200' : 'bg-white/20'
-                  }`}>
-                    <Sparkles className="w-3 h-3 inline mr-0.5" />
-                    {isAdmin ? 'Admin' : plan}
-                  </span>
-                  <span className="flex items-center gap-0.5">
-                    <Zap className="w-3 h-3" />
-                    {isAdmin ? 'Unlimited' : `${credits?.toLocaleString()} credits`}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-white/60">Log in to see your plan details</span>
+          {/* Right side: Nav + Auth stacked */}
+          <div className="flex flex-col items-end gap-2">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-1" data-testid="desktop-nav">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.id}
+                  href={link.href}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive(link.href)
+                      ? 'bg-white/25 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/15'
+                  }`}
+                >
+                  {link.label}
+                </Link>
               ))}
+            </nav>
+
+            {/* Auth Section */}
+            <div className="flex flex-col items-end gap-0">
+              <div className="flex items-center gap-2" data-testid="auth-section">
+                {loading ? (
+                  <div className="w-16 h-7 bg-white/20 rounded animate-pulse" />
+                ) : user ? (
+                  <div className="flex items-center gap-2">
+                    <Link href="/dashboard" className="flex items-center gap-1.5 px-2 py-1 text-sm text-white/90 hover:text-white">
+                      <User className="w-4 h-4" />
+                      <span className="hidden sm:inline">{getDisplayName()}</span>
+                    </Link>
+                    <span className="text-white/40 hidden sm:inline">|</span>
+                    <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-white/70 hover:text-white">
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link href="/login" className="px-3 py-1 text-sm text-white/90 hover:text-white">Log In</Link>
+                    <Link href="/signup" className="px-3 py-1.5 bg-white text-blue-600 hover:bg-white/90 rounded-lg text-sm font-medium">Sign Up</Link>
+                  </div>
+                )}
+              </div>
+              {/* Plan details */}
+              <div className="text-[11px] mt-0.5">
+                {!loading && (user ? (
+                  <div className="flex items-center gap-1.5 text-white/80">
+                    <span className={`px-1.5 py-0.5 rounded-full ${
+                      isAdmin ? 'bg-yellow-500/30 text-yellow-200' :
+                      plan === 'Pro' ? 'bg-purple-500/30 text-purple-200' : 'bg-white/20'
+                    }`}>
+                      <Sparkles className="w-3 h-3 inline mr-0.5" />
+                      {isAdmin ? 'Admin' : plan}
+                    </span>
+                    <span className="flex items-center gap-0.5">
+                      <Zap className="w-3 h-3" />
+                      {isAdmin ? 'Unlimited' : `${credits?.toLocaleString()} credits`}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-white/60">Log in to see your plan details</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
