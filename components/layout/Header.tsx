@@ -3,10 +3,9 @@
 /**
  * CR AudioViz AI - HEADER COMPONENT
  * 
- * - BIGGER logo (readable)
+ * - MUCH BIGGER logo (proportional and readable)
  * - CR = under logo, rotating phrases, Cindy & Roy every 25th
- * - No "Admin" next to name - only in plan bar
- * - Credits show exact number or "Unlimited" for admins
+ * - Credits bar shows "Log in to see your plan details"
  * 
  * @timestamp January 8, 2026
  */
@@ -114,7 +113,7 @@ export default function Header() {
 
           if (isAdminUser) {
             setPlan('Admin');
-            setCredits(null); // Will show "Unlimited"
+            setCredits(null);
           } else if (profile) {
             setCredits(profile.credits ?? 0);
             setPlan(profile.subscription_tier || 'Free');
@@ -164,9 +163,9 @@ export default function Header() {
       data-testid="site-header"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24 md:h-28">
+        <div className="flex items-center justify-between h-28 md:h-32">
           
-          {/* Logo + CR = phrase underneath - BIGGER */}
+          {/* Logo + CR = phrase underneath - MUCH BIGGER */}
           <div className="flex flex-col items-start flex-shrink-0">
             <Link 
               href="/" 
@@ -177,17 +176,17 @@ export default function Header() {
               <Image
                 src="/craudiovizailogo.png"
                 alt="CR AudioViz AI"
-                width={400}
-                height={90}
-                className="h-16 sm:h-20 md:h-[90px] w-auto"
+                width={500}
+                height={110}
+                className="h-20 sm:h-24 md:h-[110px] w-auto"
                 priority
               />
             </Link>
             {/* CR = phrase under logo */}
-            <div className="text-white/90 text-xs mt-1 flex items-center gap-1">
-              <span className="font-semibold">CR</span>
+            <div className="text-white/90 text-sm mt-1 flex items-center gap-1.5">
+              <span className="font-bold">CR</span>
               <span className="text-white/60">=</span>
-              <span className={`transition-all duration-300 ${showCindyRoy ? 'text-pink-200 font-semibold' : ''}`}>
+              <span className={`transition-all duration-300 ${showCindyRoy ? 'text-pink-200 font-bold' : ''}`}>
                 {displayPhrase}
               </span>
             </div>
@@ -218,7 +217,6 @@ export default function Header() {
                 <div className="w-20 h-10 bg-white/20 rounded-lg animate-pulse" />
               ) : user ? (
                 <div className="flex items-center gap-2" data-testid="auth-logged-in">
-                  {/* User name - NO Admin label here */}
                   <Link
                     href="/dashboard"
                     className="flex items-center gap-2 px-3 py-2 text-sm text-white/90 hover:text-white transition-colors"
@@ -280,7 +278,7 @@ export default function Header() {
                   )}
                 </div>
               ) : (
-                <span className="text-white/60">Log in to see plan details</span>
+                <span className="text-white/60">Log in to see your plan details</span>
               )}
             </div>
           </div>
