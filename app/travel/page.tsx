@@ -101,7 +101,7 @@ export default function TravelPage() {
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
               CR AudioViz AI
             </span>
           </Link>
@@ -115,7 +115,7 @@ export default function TravelPage() {
         </div>
       </header>
 
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <section className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">✈️ Travel Hub</h1>
           <p className="text-xl text-blue-100 mb-8">Compare deals from top travel sites. Best prices guaranteed.</p>
@@ -172,7 +172,7 @@ export default function TravelPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDeals.map(deal => (
               <div key={deal.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                <div className="h-48 bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
                   <span className="text-6xl">✈️</span>
                 </div>
                 <div className="p-6">
@@ -184,7 +184,7 @@ export default function TravelPage() {
                   <h3 className="text-xl font-bold mb-2">{deal.title}</h3>
                   <p className="text-gray-600 text-sm mb-4">{deal.description}</p>
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-yellow-500">★</span>
+                    <span className="text-cyan-400">★</span>
                     <span className="font-medium">{deal.rating}</span>
                     <span className="text-gray-400">({deal.reviewCount.toLocaleString()} reviews)</span>
                   </div>
