@@ -55,7 +55,7 @@ export default async function CrochetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-pink-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-cyan-500 via-cyan-500 to-white">
       {/* Header with auth status */}
       <CrochetHeader 
         user={userProfile} 
@@ -65,7 +65,7 @@ export default async function CrochetPage() {
       {/* Hero Section */}
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-cyan-500 text-cyan-500 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <span>🧶</span>
             <span>Part of CR AudioViz AI Hobbies</span>
           </div>
@@ -76,26 +76,26 @@ export default async function CrochetPage() {
           <p className="text-xl text-gray-600 mb-2">
             AI-Powered Pattern Generator
           </p>
-          <p className="text-lg text-purple-600 font-medium">
+          <p className="text-lg text-cyan-500 font-medium">
             Mathematically Perfect Patterns in Seconds
           </p>
           
           {/* Value Props */}
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-              <span className="text-green-500">✓</span>
+              <span className="text-cyan-500">✓</span>
               <span className="text-sm">Verified Stitch Counts</span>
             </div>
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-              <span className="text-green-500">✓</span>
+              <span className="text-cyan-500">✓</span>
               <span className="text-sm">Working Patterns</span>
             </div>
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-              <span className="text-green-500">✓</span>
+              <span className="text-cyan-500">✓</span>
               <span className="text-sm">Instant Generation</span>
             </div>
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-              <span className="text-green-500">✓</span>
+              <span className="text-cyan-500">✓</span>
               <span className="text-sm">90% Cheaper than Etsy</span>
             </div>
           </div>
@@ -126,10 +126,10 @@ export default async function CrochetPage() {
               { name: 'Standard', credits: 5, examples: 'Manatee, Octopus', icon: '🦭' },
               { name: 'Complex', credits: 7, examples: 'Teddy Bear, Cat', icon: '🧸' },
             ].map((tier) => (
-              <div key={tier.name} className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-2xl text-center">
+              <div key={tier.name} className="bg-gradient-to-br from-cyan-500 to-cyan-500 p-6 rounded-2xl text-center">
                 <div className="text-4xl mb-3">{tier.icon}</div>
                 <h3 className="font-bold text-lg">{tier.name}</h3>
-                <div className="text-3xl font-bold text-purple-600 my-2">{tier.credits}</div>
+                <div className="text-3xl font-bold text-cyan-500 my-2">{tier.credits}</div>
                 <div className="text-sm text-gray-500">credits</div>
                 <div className="text-xs text-gray-400 mt-2">{tier.examples}</div>
               </div>
@@ -142,7 +142,7 @@ export default async function CrochetPage() {
             </p>
             <a 
               href="/pricing" 
-              className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-cyan-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-cyan-500 transition-colors"
             >
               Get Credits
               <span>→</span>
@@ -205,7 +205,7 @@ export default async function CrochetPage() {
                 {item}
               </span>
             ))}
-            <span className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium">
+            <span className="bg-cyan-500 text-cyan-500 px-4 py-2 rounded-full text-sm font-medium">
               + More coming soon!
             </span>
           </div>
@@ -213,10 +213,10 @@ export default async function CrochetPage() {
       </section>
       
       {/* Footer CTA */}
-      <section className="py-16 px-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white">
+      <section className="py-16 px-4 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Create?</h2>
-          <p className="text-xl text-purple-100 mb-8">
+          <p className="text-xl text-cyan-500 mb-8">
             Start generating patterns now. Your first simple pattern is free!
           </p>
           
@@ -224,13 +224,13 @@ export default async function CrochetPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href="/login?redirect=/hobbies/crochet"
-                className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition-colors"
+                className="bg-white text-cyan-500 px-8 py-4 rounded-xl font-bold hover:bg-cyan-500 transition-colors"
               >
                 Sign In to Start
               </a>
               <a 
                 href="/pricing"
-                className="bg-purple-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-800 transition-colors border border-purple-400"
+                className="bg-cyan-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-cyan-500 transition-colors border border-cyan-500"
               >
                 View Pricing
               </a>
@@ -238,7 +238,7 @@ export default async function CrochetPage() {
           ) : (
             <a 
               href="#generator"
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition-colors inline-block"
+              className="bg-white text-cyan-500 px-8 py-4 rounded-xl font-bold hover:bg-cyan-500 transition-colors inline-block"
             >
               Start Generating ↑
             </a>
