@@ -39,7 +39,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Logo',
     description: 'AI-powered logo creation and brand identity',
     icon: <Palette className="w-5 h-5" />,
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-violet-500 to-cyan-500',
     url: 'https://crav-logo-studio.vercel.app',
     category: 'creative',
     features: ['AI Logo Generation', 'Brand Kits', 'Mockups'],
@@ -63,7 +63,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Social',
     description: 'Design social media content at scale',
     icon: <Image className="w-5 h-5" />,
-    color: 'from-pink-500 to-rose-500',
+    color: 'from-cyan-500 to-rose-500',
     url: 'https://crav-social-graphics.vercel.app',
     category: 'marketing',
     features: ['Templates', 'Scheduler', 'AI Captions'],
@@ -75,7 +75,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Invoices',
     description: 'Professional invoicing made simple',
     icon: <FileText className="w-5 h-5" />,
-    color: 'from-emerald-500 to-green-500',
+    color: 'from-cyan-500 to-cyan-500',
     url: 'https://crav-invoice-generator.vercel.app',
     category: 'business',
     features: ['Auto-Calculate', 'PDF Export', 'Client Database'],
@@ -87,7 +87,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Stocks',
     description: 'AI stock predictions and analysis',
     icon: <BarChart3 className="w-5 h-5" />,
-    color: 'from-amber-500 to-orange-500',
+    color: 'from-cyan-500 to-cyan-500',
     url: 'https://crav-market-oracle.vercel.app',
     category: 'business',
     features: ['AI Predictions', 'Real-time Data', 'Alerts'],
@@ -111,7 +111,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Spirits',
     description: 'Discover premium spirits',
     icon: <Wine className="w-5 h-5" />,
-    color: 'from-amber-600 to-yellow-600',
+    color: 'from-cyan-500 to-cyan-400',
     url: 'https://cravbarrels.vercel.app',
     category: 'lifestyle',
     features: ['Spirit Database', 'Tasting Notes', 'Collections'],
@@ -135,7 +135,7 @@ const ECOSYSTEM_APPS: AppInfo[] = [
     shortName: 'Cards',
     description: 'Trading card collection manager',
     icon: <Layers className="w-5 h-5" />,
-    color: 'from-indigo-500 to-purple-500',
+    color: 'from-cyan-500 to-cyan-500',
     url: 'https://cravcards.vercel.app',
     category: 'lifestyle',
     features: ['Collection Tracking', 'Price Alerts', 'Wishlist'],
@@ -189,10 +189,10 @@ export default function EcosystemHub({ currentApp, onClose, isOpen = true }: Eco
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-900 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden border border-gray-700 shadow-2xl">
         {/* Header */}
-        <div className="p-4 border-b border-gray-800 bg-gradient-to-r from-violet-500/10 to-pink-500/10">
+        <div className="p-4 border-b border-gray-800 bg-gradient-to-r from-violet-500/10 to-cyan-500/10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-xl flex items-center justify-center">
                 <Grid className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -346,7 +346,7 @@ export default function EcosystemHub({ currentApp, onClose, isOpen = true }: Eco
                   <div key={asset.id} className="bg-gray-800 rounded-lg p-3 hover:bg-gray-750 cursor-pointer">
                     <div className="aspect-square bg-gray-700 rounded-lg mb-2 flex items-center justify-center">
                       {asset.type === 'logo' && (
-                        <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-lg flex items-center justify-center">
                           <span className="text-white font-bold text-xl">B</span>
                         </div>
                       )}
@@ -399,7 +399,7 @@ export default function EcosystemHub({ currentApp, onClose, isOpen = true }: Eco
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">
+                          <span className="flex items-center gap-1 px-2 py-1 bg-cyan-500/20 text-cyan-500 text-xs rounded">
                             <Check className="w-3 h-3" />
                             Connected
                           </span>
@@ -444,7 +444,7 @@ export default function EcosystemHub({ currentApp, onClose, isOpen = true }: Eco
               href="https://cr-audioviz-ai.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-pink-500 rounded-lg text-sm font-medium hover:opacity-90"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-lg text-sm font-medium hover:opacity-90"
             >
               View All Apps
               <ExternalLink className="w-4 h-4" />
