@@ -41,7 +41,7 @@ const EXPORT_TARGETS: ExportTarget[] = [
     id: 'social-graphics',
     name: 'Social Graphics',
     icon: <Image className="w-5 h-5" />,
-    color: 'from-pink-500 to-rose-500',
+    color: 'from-cyan-500 to-cyan-500',
     url: 'https://crav-social-graphics.vercel.app',
     actions: [
       { id: 'brand-post', label: 'Create Branded Post', description: 'New post with your branding', available: true },
@@ -53,7 +53,7 @@ const EXPORT_TARGETS: ExportTarget[] = [
     id: 'invoice-generator',
     name: 'Invoice Generator',
     icon: <FileText className="w-5 h-5" />,
-    color: 'from-emerald-500 to-green-500',
+    color: 'from-cyan-500 to-cyan-500',
     url: 'https://crav-invoice-generator.vercel.app',
     actions: [
       { id: 'invoice-logo', label: 'Add to Invoices', description: 'Use as invoice header logo', available: true },
@@ -124,7 +124,7 @@ export default function QuickExportToApp({
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-xl flex items-center justify-center">
                 <Send className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -211,7 +211,7 @@ export default function QuickExportToApp({
                     disabled={!action.available}
                     className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                       selectedAction === action.id
-                        ? 'bg-violet-600 text-white'
+                        ? 'bg-cyan-400 text-white'
                         : action.available
                         ? 'bg-gray-800 hover:bg-gray-750'
                         : 'bg-gray-800/50 opacity-50 cursor-not-allowed'
@@ -219,7 +219,7 @@ export default function QuickExportToApp({
                   >
                     <div className="text-left">
                       <p className="font-medium">{action.label}</p>
-                      <p className={`text-xs ${selectedAction === action.id ? 'text-violet-200' : 'text-gray-500'}`}>
+                      <p className={`text-xs ${selectedAction === action.id ? 'text-cyan-400' : 'text-gray-500'}`}>
                         {action.description}
                       </p>
                     </div>
@@ -231,8 +231,8 @@ export default function QuickExportToApp({
           ) : (
             /* Export Complete */
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-green-400" />
+              <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="w-8 h-8 text-cyan-500" />
               </div>
               <h3 className="text-xl font-bold mb-2">Export Complete!</h3>
               <p className="text-gray-400 mb-4">
@@ -242,7 +242,7 @@ export default function QuickExportToApp({
                 href={selectedTarget?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-400 hover:bg-cyan-400 rounded-lg text-sm"
               >
                 Open {selectedTarget?.name}
                 <ExternalLink className="w-4 h-4" />
@@ -257,7 +257,7 @@ export default function QuickExportToApp({
             <button
               onClick={handleExport}
               disabled={!selectedAction || isExporting}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-400 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
             >
               {isExporting ? (
                 <>
