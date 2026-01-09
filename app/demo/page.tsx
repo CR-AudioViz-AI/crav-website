@@ -104,7 +104,7 @@ export default function DemoPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-500 to-slate-900 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -118,7 +118,7 @@ export default function DemoPage() {
           <div className="space-y-3">
             <Link 
               href="/"
-              className="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition"
+              className="block w-full bg-cyan-500 hover:bg-cyan-500 text-white font-semibold py-3 px-6 rounded-lg transition"
             >
               Return Home
             </Link>
@@ -135,7 +135,7 @@ export default function DemoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-500 to-slate-900">
       {/* Header */}
       <header className="border-b border-white/10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -157,12 +157,12 @@ export default function DemoPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block bg-purple-500/20 text-purple-300 px-4 py-1 rounded-full text-sm font-medium mb-6">
+          <span className="inline-block bg-cyan-500/20 text-cyan-500 px-4 py-1 rounded-full text-sm font-medium mb-6">
             🚀 Limited Pilot Program
           </span>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Experience the Future of
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> AI-Powered Business</span>
+            <span className="bg-gradient-to-r from-cyan-500 to-cyan-500 bg-clip-text text-transparent"> AI-Powered Business</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
             Join our exclusive pilot program and be among the first to access the complete CR AudioViz AI ecosystem with Javari AI, creative tools, and enterprise solutions.
@@ -207,7 +207,7 @@ export default function DemoPage() {
                 <div key={index} className="bg-white/5 rounded-xl p-5">
                   <p className="text-gray-300 italic mb-3">&ldquo;{testimonial.quote}&rdquo;</p>
                   <div className="text-sm">
-                    <span className="text-purple-400 font-medium">{testimonial.author}</span>
+                    <span className="text-cyan-500 font-medium">{testimonial.author}</span>
                     <span className="text-gray-500"> • {testimonial.role}</span>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function DemoPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder="John Smith"
                   />
                 </div>
@@ -247,7 +247,7 @@ export default function DemoPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder="john@company.com"
                   />
                 </div>
@@ -262,7 +262,7 @@ export default function DemoPage() {
                     required
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder="Acme Inc."
                   />
                 </div>
@@ -273,7 +273,7 @@ export default function DemoPage() {
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder="CEO, CTO, Marketing Director..."
                   />
                 </div>
@@ -286,7 +286,7 @@ export default function DemoPage() {
                     name="companySize"
                     value={formData.companySize}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="" className="bg-slate-800">Select...</option>
                     <option value="1-10" className="bg-slate-800">1-10 employees</option>
@@ -302,7 +302,7 @@ export default function DemoPage() {
                     name="useCase"
                     value={formData.useCase}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="" className="bg-slate-800">Select...</option>
                     <option value="ai-assistant" className="bg-slate-800">AI Assistant (Javari)</option>
@@ -323,7 +323,7 @@ export default function DemoPage() {
                   rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
                   placeholder="What challenges are you looking to solve? What features interest you most?"
                 />
               </div>
@@ -331,16 +331,16 @@ export default function DemoPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-500 hover:from-cyan-500 hover:to-cyan-500 text-white font-semibold py-4 px-6 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Submitting...' : 'Request Demo'}
               </button>
 
               <p className="text-xs text-gray-500 text-center">
                 By submitting, you agree to our{' '}
-                <Link href="/privacy" className="text-purple-400 hover:underline">Privacy Policy</Link>
+                <Link href="/privacy" className="text-cyan-500 hover:underline">Privacy Policy</Link>
                 {' '}and{' '}
-                <Link href="/terms" className="text-purple-400 hover:underline">Terms of Service</Link>.
+                <Link href="/terms" className="text-cyan-500 hover:underline">Terms of Service</Link>.
               </p>
             </form>
           </motion.div>
