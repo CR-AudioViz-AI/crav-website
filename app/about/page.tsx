@@ -34,7 +34,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-24 px-4">
+      <div className="bg-gradient-to-br from-blue-600 via-cyan-600 to-cyan-500 text-white py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -107,7 +107,7 @@ export default function AboutPage() {
                 transition={{ delay: idx * 0.1 }}
                 className="text-center"
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
                   {member.emoji}
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white">{member.name}</h3>
@@ -155,7 +155,7 @@ export default function AboutPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/signup"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-slate-700"
             >
               Get Started Free →
             </Link>
