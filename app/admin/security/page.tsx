@@ -195,7 +195,7 @@ export default function SecurityDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-green-600 border-green-600">
+          <Badge variant="outline" className="text-cyan-500 border-cyan-500">
             <Activity className="w-3 h-3 mr-1" />
             System Protected
           </Badge>
@@ -303,8 +303,8 @@ export default function SecurityDashboard() {
                           <div 
                             className={`h-2 rounded-full ${
                               severity === 'critical' ? 'bg-red-500' :
-                              severity === 'high' ? 'bg-orange-500' :
-                              severity === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                              severity === 'high' ? 'bg-cyan-500' :
+                              severity === 'medium' ? 'bg-cyan-400' : 'bg-cyan-500'
                             }`}
                             style={{ width: `${(count / stats.total_threats) * 100}%` }}
                           />
@@ -425,8 +425,8 @@ function StatCard({
   const colorClasses = {
     default: 'text-blue-600',
     destructive: 'text-red-600',
-    warning: 'text-yellow-600',
-    success: 'text-green-600',
+    warning: 'text-cyan-400',
+    success: 'text-cyan-500',
   };
 
   return (
@@ -462,7 +462,7 @@ function ThreatItem({
         {threat.blocked || threat.trapped_in_honeypot ? (
           <Ban className="w-5 h-5 text-red-500" />
         ) : (
-          <AlertTriangle className="w-5 h-5 text-yellow-500" />
+          <AlertTriangle className="w-5 h-5 text-cyan-400" />
         )}
       </div>
       
@@ -473,7 +473,7 @@ function ThreatItem({
           </Badge>
           <Badge variant="outline">{threat.threat_type.replace(/_/g, ' ')}</Badge>
           {threat.handled_by_javari && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
+            <Badge variant="secondary" className="bg-cyan-500 text-cyan-500">
               <Shield className="w-3 h-3 mr-1" />
               Javari Handled
             </Badge>
@@ -549,7 +549,7 @@ function JavariTicketItem({ ticket }: { ticket: JavariTicket }) {
         </div>
         {ticket.resolved_at && (
           <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-green-600" />
+            <CheckCircle2 className="w-3 h-3 text-cyan-500" />
             Resolved {new Date(ticket.resolved_at).toLocaleString()}
           </div>
         )}
