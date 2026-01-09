@@ -14,14 +14,14 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-500 via-cyan-500 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <Users className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Join Our Community
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
+            <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8">
               Connect with 100,000+ creators building amazing things
             </p>
           </div>
@@ -117,16 +117,16 @@ export default function CommunityPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-500 to-cyan-500 text-white">
         <div className="container mx-auto text-center">
           <Heart className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Join?</h2>
-          <p className="text-base md:text-lg text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-cyan-500 mb-6 md:mb-8 max-w-2xl mx-auto">
             Become part of our creative community today
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <a href="https://discord.gg/craudiovizai" target="_blank" rel="noopener noreferrer" className="flex-1">
-              <MobileButton size="lg" fullWidth className="bg-white text-purple-600 hover:bg-purple-50">
+              <MobileButton size="lg" fullWidth className="bg-white text-cyan-500 hover:bg-cyan-500">
                 Join Discord
               </MobileButton>
             </a>
