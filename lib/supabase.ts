@@ -1,10 +1,18 @@
-// ============================================================================
-// UNIVERSAL SUPABASE CLIENT - CR AUDIOVIZ AI ECOSYSTEM
-// Centralized database connection for all apps
-// Dependency-free version (only requires @supabase/supabase-js)
-// ============================================================================
+/**
+ * CR AudioViz AI - Supabase Client (Hub/Platform)
+ * =================================================
+ * 
+ * Master database client for the CR AudioViz AI platform.
+ * This is the CENTRAL HUB - all services originate here.
+ * 
+ * For sub-apps, use the central-services.ts API calls instead
+ * of direct database access.
+ */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// Re-export admin utilities from central services
+export { isAdmin, shouldChargeCredits, ADMIN_EMAILS, CentralServices } from './central-services';
 
 // Centralized Supabase configuration
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://kteobfyferrukqeolofj.supabase.co';
@@ -52,4 +60,5 @@ export function createSupabaseServerClient(): SupabaseClient {
   return createClient(SUPABASE_URL, serviceKey);
 }
 
-export { SUPABASE_URL, SUPABASE_ANON_KEY };
+export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY };
+export default supabase;
