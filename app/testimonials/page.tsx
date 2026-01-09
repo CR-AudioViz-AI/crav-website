@@ -99,18 +99,18 @@ export default function TestimonialsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-blue-600 via-cyan-500 to-cyan-500 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-6 h-6 md:w-8 md:h-8 fill-yellow-400 text-yellow-400" />
+                <Star key={i} className="w-6 h-6 md:w-8 md:h-8 fill-cyan-400 text-cyan-400" />
               ))}
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
               Loved by Creators Worldwide
             </h1>
-            <p className="text-lg md:text-xl text-purple-100 mb-3">
+            <p className="text-lg md:text-xl text-cyan-500 mb-3">
               <span className="font-bold text-2xl md:text-3xl">{avgRating}</span> average rating from{' '}
               <span className="font-bold">{totalReviews.toLocaleString()}+</span> reviews
             </p>
@@ -131,15 +131,15 @@ export default function TestimonialsPage() {
                 <div className="text-sm md:text-base text-gray-600">Customer Satisfaction</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <Award className="w-6 h-6 md:w-8 md:h-8 text-green-600" />
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                  <Award className="w-6 h-6 md:w-8 md:h-8 text-cyan-500" />
                 </div>
                 <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">4.9/5</div>
                 <div className="text-sm md:text-base text-gray-600">Average Rating</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                  <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8 text-cyan-500" />
                 </div>
                 <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">100K+</div>
                 <div className="text-sm md:text-base text-gray-600">Happy Creators</div>
@@ -162,25 +162,25 @@ export default function TestimonialsPage() {
                 <Card 
                   key={testimonial.id}
                   className={`hover:shadow-xl transition-all ${
-                    testimonial.featured ? 'border-2 border-purple-500' : ''
+                    testimonial.featured ? 'border-2 border-cyan-500' : ''
                   }`}
                 >
                   <CardContent className="p-4 md:p-6">
                     {/* Featured Badge */}
                     {testimonial.featured && (
                       <div className="flex items-center gap-1 mb-3">
-                        <Award className="w-4 h-4 text-purple-600" />
-                        <span className="text-xs font-bold text-purple-600 uppercase">Featured</span>
+                        <Award className="w-4 h-4 text-cyan-500" />
+                        <span className="text-xs font-bold text-cyan-500 uppercase">Featured</span>
                       </div>
                     )}
 
                     {/* Rating */}
                     <div className="flex items-center gap-1 mb-3">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <Star key={i} className="w-4 h-4 fill-cyan-400 text-cyan-400" />
                       ))}
                       {testimonial.verified && (
-                        <CheckCircle2 className="w-4 h-4 text-green-600 ml-2" />
+                        <CheckCircle2 className="w-4 h-4 text-cyan-500 ml-2" />
                       )}
                     </div>
 
@@ -194,8 +194,8 @@ export default function TestimonialsPage() {
 
                     {/* Result */}
                     {testimonial.result && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                        <p className="text-xs md:text-sm font-semibold text-green-900">
+                      <div className="bg-cyan-500 border border-cyan-500 rounded-lg p-3 mb-4">
+                        <p className="text-xs md:text-sm font-semibold text-cyan-500">
                           📈 {testimonial.result}
                         </p>
                       </div>
@@ -240,12 +240,12 @@ export default function TestimonialsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-500 to-cyan-500 text-white">
         <div className="container mx-auto text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             Join Thousands of Happy Creators
           </h2>
-          <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8 max-w-2xl mx-auto">
             Start creating amazing content today with 50 free credits
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -253,7 +253,7 @@ export default function TestimonialsPage() {
               <MobileButton 
                 size="lg" 
                 fullWidth
-                className="bg-white text-purple-600 hover:bg-purple-50"
+                className="bg-white text-cyan-500 hover:bg-cyan-500"
               >
                 Start Free Trial
               </MobileButton>
