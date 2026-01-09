@@ -107,18 +107,18 @@ CREATE INDEX IF NOT EXISTS idx_legalease_documents_created_at ON public.legaleas
               <div className="flex items-center gap-3">
                 {tableExists ? (
                   <>
-                    <CheckCircle className="w-6 h-6 text-green-600" />
+                    <CheckCircle className="w-6 h-6 text-cyan-500" />
                     <div>
-                      <p className="font-semibold text-green-900">✅ Database Ready</p>
-                      <p className="text-sm text-green-700">All tables and policies are configured correctly.</p>
+                      <p className="font-semibold text-cyan-500">✅ Database Ready</p>
+                      <p className="text-sm text-cyan-500">All tables and policies are configured correctly.</p>
                     </div>
                   </>
                 ) : (
                   <>
-                    <AlertCircle className="w-6 h-6 text-amber-600" />
+                    <AlertCircle className="w-6 h-6 text-cyan-500" />
                     <div>
-                      <p className="font-semibold text-amber-900">⚠️ Migration Required</p>
-                      <p className="text-sm text-amber-700">The legalease_documents table needs to be created.</p>
+                      <p className="font-semibold text-cyan-500">⚠️ Migration Required</p>
+                      <p className="text-sm text-cyan-500">The legalease_documents table needs to be created.</p>
                     </div>
                   </>
                 )}
@@ -166,7 +166,7 @@ CREATE INDEX IF NOT EXISTS idx_legalease_documents_created_at ON public.legaleas
                     href="https://supabase.com/dashboard/project/kteobfyferrukqeolofj/sql"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                    className="inline-block bg-cyan-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-cyan-500 transition-colors"
                   >
                     Open SQL Editor →
                   </a>
@@ -215,8 +215,8 @@ CREATE INDEX IF NOT EXISTS idx_legalease_documents_created_at ON public.legaleas
         {tableExists && (
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-10 h-10 text-green-600" />
+              <div className="w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-10 h-10 text-cyan-500" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">✅ All Set!</h2>
               <p className="text-gray-600 mb-6">LegalEase AI database is fully configured and operational.</p>
