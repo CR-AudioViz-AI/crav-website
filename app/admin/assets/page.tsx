@@ -72,15 +72,15 @@ const ASSET_TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const ASSET_TYPE_COLORS: Record<string, string> = {
-  spirit: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  spirit: 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30',
   ebook: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  audiobook: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  image: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-  music: 'bg-green-500/20 text-green-400 border-green-500/30',
-  sound_effect: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  audiobook: 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30',
+  image: 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30',
+  music: 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30',
+  sound_effect: 'bg-cyan-400/20 text-cyan-400 border-cyan-400/30',
   video: 'bg-red-500/20 text-red-400 border-red-500/30',
   font: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  logo: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+  logo: 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30',
   default: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
 };
 
@@ -176,7 +176,7 @@ export default function UniversalAssetManager() {
     <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIwMjAzMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
       </div>
@@ -185,7 +185,7 @@ export default function UniversalAssetManager() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-cyan-500 to-red-400 bg-clip-text text-transparent">
               Universal Asset Manager
             </h1>
             <p className="text-gray-400 mt-1">
@@ -203,7 +203,7 @@ export default function UniversalAssetManager() {
             </button>
             <button
               onClick={() => setShowUpload(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-500 hover:from-cyan-500 hover:to-cyan-500 text-black font-semibold transition-all"
             >
               <Upload className="w-4 h-4" />
               Upload Assets
@@ -219,7 +219,7 @@ export default function UniversalAssetManager() {
               onClick={() => setSelectedType(selectedType === item.type ? null : item.type)}
               className={`p-4 rounded-xl border transition-all ${
                 selectedType === item.type
-                  ? 'bg-amber-500/20 border-amber-500/50'
+                  ? 'bg-cyan-500/20 border-cyan-500/50'
                   : 'bg-white/5 border-white/10 hover:border-white/20'
               }`}
             >
@@ -244,14 +244,14 @@ export default function UniversalAssetManager() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && fetchAssets()}
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
             />
           </div>
 
           <select
             value={selectedType || ''}
             onChange={(e) => setSelectedType(e.target.value || null)}
-            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-amber-500/50 focus:outline-none appearance-none cursor-pointer min-w-[150px]"
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-500/50 focus:outline-none appearance-none cursor-pointer min-w-[150px]"
           >
             <option value="">All Types</option>
             {stats?.byType?.map((item) => (
@@ -264,7 +264,7 @@ export default function UniversalAssetManager() {
           <select
             value={selectedCategory || ''}
             onChange={(e) => setSelectedCategory(e.target.value || null)}
-            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-amber-500/50 focus:outline-none appearance-none cursor-pointer min-w-[150px]"
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-500/50 focus:outline-none appearance-none cursor-pointer min-w-[150px]"
           >
             <option value="">All Categories</option>
             {stats?.byCategory?.map((item) => (
@@ -291,7 +291,7 @@ export default function UniversalAssetManager() {
 
           <button
             onClick={fetchAssets}
-            className="px-4 py-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-all"
+            className="px-4 py-3 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-500 hover:bg-cyan-500/30 transition-all"
           >
             Search
           </button>
@@ -308,7 +308,7 @@ export default function UniversalAssetManager() {
               </span>
             )}
             {selectedType && (
-              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-sm">
+              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-500 text-sm">
                 Type: {selectedType}
                 <button onClick={() => setSelectedType(null)}><X className="w-3 h-3" /></button>
               </span>
@@ -331,7 +331,7 @@ export default function UniversalAssetManager() {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
@@ -342,7 +342,7 @@ export default function UniversalAssetManager() {
               <div
                 key={asset.id}
                 onClick={() => setSelectedAsset(asset)}
-                className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 hover:bg-white/10 cursor-pointer transition-all"
+                className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-white/10 cursor-pointer transition-all"
               >
                 {/* Preview */}
                 <div className="aspect-square rounded-lg bg-black/30 mb-3 flex items-center justify-center overflow-hidden">
@@ -395,7 +395,7 @@ export default function UniversalAssetManager() {
               <div
                 key={asset.id}
                 onClick={() => setSelectedAsset(asset)}
-                className="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-white/5 border border-white/10 hover:border-amber-500/30 cursor-pointer transition-all"
+                className="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-500/30 cursor-pointer transition-all"
               >
                 <div className="col-span-4 flex items-center gap-3">
                   <span className={`p-2 rounded-lg ${ASSET_TYPE_COLORS[asset.asset_type] || ASSET_TYPE_COLORS.default}`}>
@@ -556,7 +556,7 @@ export default function UniversalAssetManager() {
                     href={selectedAsset.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-black font-medium hover:bg-amber-400 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-500 text-black font-medium hover:bg-cyan-500 transition-all"
                   >
                     <Download className="w-4 h-4" />
                     Download
@@ -586,7 +586,7 @@ export default function UniversalAssetManager() {
                 </button>
               </div>
 
-              <div className="border-2 border-dashed border-white/20 rounded-xl p-12 text-center hover:border-amber-500/50 transition-all cursor-pointer">
+              <div className="border-2 border-dashed border-white/20 rounded-xl p-12 text-center hover:border-cyan-500/50 transition-all cursor-pointer">
                 <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                 <p className="text-lg font-medium mb-2">Drop files here</p>
                 <p className="text-sm text-gray-400">or click to browse</p>
