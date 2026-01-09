@@ -95,11 +95,11 @@ const HAIR_COLORS = ['#2C1810', '#8B4513', '#DAA520', '#FF6B35', '#1A1A2E', '#FF
 const EYE_COLORS = ['#4A90A4', '#2E5E4E', '#8B4513', '#1A1A2E', '#9B59B6', '#E74C3C']
 const BACKGROUNDS = [
   { id: 'blue', color: 'from-blue-500 to-cyan-500', premium: false },
-  { id: 'purple', color: 'from-purple-500 to-pink-500', premium: false },
-  { id: 'green', color: 'from-green-500 to-emerald-500', premium: false },
-  { id: 'sunset', color: 'from-orange-500 to-red-500', premium: false },
-  { id: 'galaxy', color: 'from-indigo-900 via-purple-900 to-pink-900', premium: true },
-  { id: 'neon', color: 'from-cyan-400 via-purple-500 to-pink-500', premium: true },
+  { id: 'purple', color: 'from-cyan-500 to-cyan-500', premium: false },
+  { id: 'green', color: 'from-cyan-500 to-cyan-500', premium: false },
+  { id: 'sunset', color: 'from-cyan-500 to-red-500', premium: false },
+  { id: 'galaxy', color: 'from-cyan-500 via-cyan-500 to-cyan-500', premium: true },
+  { id: 'neon', color: 'from-cyan-400 via-cyan-500 to-cyan-500', premium: true },
 ]
 
 export default function AvatarCreationStudio() {
@@ -138,14 +138,14 @@ export default function AvatarCreationStudio() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-500 rounded-xl p-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
             <User className="w-7 h-7 text-white" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Avatar Creation Studio</h1>
-            <p className="text-violet-200">Design your unique CRAIverse identity</p>
+            <p className="text-cyan-400">Design your unique CRAIverse identity</p>
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ export default function AvatarCreationStudio() {
                 onClick={() => setActiveCategory(index)}
                 className={`px-4 py-2 rounded-lg whitespace-nowrap ${
                   activeCategory === index
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-cyan-500 text-white'
                     : 'bg-gray-800 text-gray-400'
                 }`}
               >
@@ -281,15 +281,15 @@ export default function AvatarCreationStudio() {
                     }}
                     className={`p-4 rounded-xl text-center relative ${
                       isSelected
-                        ? 'bg-purple-600 border-2 border-purple-400'
-                        : 'bg-gray-800 border border-gray-700 hover:border-purple-500/50'
+                        ? 'bg-cyan-500 border-2 border-cyan-500'
+                        : 'bg-gray-800 border border-gray-700 hover:border-cyan-500/50'
                     } ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <span className="text-3xl block mb-2">{option.icon}</span>
                     <span className="text-sm">{option.name}</span>
                     {option.premium && (
                       <span className="absolute top-2 right-2">
-                        {isLocked ? <Lock className="w-4 h-4 text-yellow-400" /> : <Crown className="w-4 h-4 text-yellow-400" />}
+                        {isLocked ? <Lock className="w-4 h-4 text-cyan-400" /> : <Crown className="w-4 h-4 text-cyan-400" />}
                       </span>
                     )}
                   </button>
@@ -307,7 +307,7 @@ export default function AvatarCreationStudio() {
                   key={tone}
                   onClick={() => setAvatar({ ...avatar, skinTone: tone })}
                   className={`w-12 h-12 rounded-lg text-2xl flex items-center justify-center ${
-                    avatar.skinTone === tone ? 'ring-2 ring-purple-500 bg-gray-700' : 'bg-gray-800'
+                    avatar.skinTone === tone ? 'ring-2 ring-cyan-500 bg-gray-700' : 'bg-gray-800'
                   }`}
                 >
                   ✋{tone}
@@ -318,14 +318,14 @@ export default function AvatarCreationStudio() {
 
           {/* Premium Upsell */}
           {!isPremium && (
-            <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-4">
+            <div className="bg-gradient-to-r from-cyan-400/20 to-cyan-500/20 border border-cyan-400/30 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <Crown className="w-8 h-8 text-yellow-400" />
+                <Crown className="w-8 h-8 text-cyan-400" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-yellow-400">Unlock Premium Items</h3>
+                  <h3 className="font-semibold text-cyan-400">Unlock Premium Items</h3>
                   <p className="text-sm text-gray-400">Get exclusive faces, outfits, and backgrounds</p>
                 </div>
-                <button className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg">
+                <button className="px-4 py-2 bg-cyan-400 hover:bg-cyan-400 text-black font-medium rounded-lg">
                   Upgrade
                 </button>
               </div>
@@ -334,7 +334,7 @@ export default function AvatarCreationStudio() {
 
           {/* Save Actions */}
           <div className="flex gap-3">
-            <button className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium flex items-center justify-center gap-2">
+            <button className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-500 rounded-xl font-medium flex items-center justify-center gap-2">
               <Save className="w-5 h-5" /> Save Avatar
             </button>
             <button className="px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl">
