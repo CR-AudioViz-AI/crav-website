@@ -194,10 +194,10 @@ export default function VercelMonitoringPage() {
 
   const getStateColor = (state: string) => {
     switch (state) {
-      case 'READY': return 'bg-green-500';
+      case 'READY': return 'bg-cyan-500';
       case 'ERROR': return 'bg-red-500';
       case 'BUILDING': return 'bg-blue-500';
-      case 'QUEUED': return 'bg-yellow-500';
+      case 'QUEUED': return 'bg-cyan-400';
       case 'CANCELED': return 'bg-slate-500';
       default: return 'bg-slate-500';
     }
@@ -206,13 +206,13 @@ export default function VercelMonitoringPage() {
   const getStateIcon = (state: string) => {
     switch (state) {
       case 'READY':
-        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+        return <CheckCircle2 className="w-5 h-5 text-cyan-500" />;
       case 'ERROR':
         return <XCircle className="w-5 h-5 text-red-500" />;
       case 'BUILDING':
         return <RefreshCw className="w-5 h-5 text-blue-500 animate-spin" />;
       case 'QUEUED':
-        return <Clock className="w-5 h-5 text-yellow-500" />;
+        return <Clock className="w-5 h-5 text-cyan-400" />;
       case 'CANCELED':
         return <AlertCircle className="w-5 h-5 text-slate-500" />;
       default:
@@ -288,7 +288,7 @@ export default function VercelMonitoringPage() {
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
                 autoRefresh
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  ? 'bg-cyan-500 hover:bg-cyan-500 text-white'
                   : 'bg-slate-700 hover:bg-slate-600 text-white'
               }`}
             >
@@ -323,7 +323,7 @@ export default function VercelMonitoringPage() {
             <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-slate-400 text-sm font-medium">Success Rate</h3>
-                <TrendingUp className="w-5 h-5 text-green-500" />
+                <TrendingUp className="w-5 h-5 text-cyan-500" />
               </div>
               <p className="text-3xl font-bold text-white">{stats.successRate.toFixed(1)}%</p>
               <p className="text-slate-500 text-sm mt-1">build quality</p>
@@ -383,7 +383,7 @@ export default function VercelMonitoringPage() {
                             {deployment.state}
                           </span>
                           {deployment.target === 'production' && (
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-500 text-white">
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500 text-white">
                               PRODUCTION
                             </span>
                           )}
@@ -476,9 +476,9 @@ export default function VercelMonitoringPage() {
                             log.level === 'error'
                               ? 'text-red-400'
                               : log.level === 'warning'
-                              ? 'text-yellow-400'
+                              ? 'text-cyan-400'
                               : log.type === 'stderr'
-                              ? 'text-orange-400'
+                              ? 'text-cyan-500'
                               : 'text-slate-300'
                           }`}
                         >
