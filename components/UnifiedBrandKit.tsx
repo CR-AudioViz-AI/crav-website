@@ -46,8 +46,8 @@ const DEMO_BRAND_ASSETS: BrandAsset[] = [
 
 const CONNECTED_APPS: ConnectedApp[] = [
   { id: 'website-builder', name: 'Website Builder', icon: <Globe className="w-4 h-4" />, color: 'from-blue-500 to-cyan-500', synced: true, lastSync: '2 min ago' },
-  { id: 'social-graphics', name: 'Social Graphics', icon: <Image className="w-4 h-4" />, color: 'from-pink-500 to-rose-500', synced: true, lastSync: '5 min ago' },
-  { id: 'invoice-generator', name: 'Invoice Generator', icon: <FileText className="w-4 h-4" />, color: 'from-emerald-500 to-green-500', synced: true, lastSync: '1 hr ago' },
+  { id: 'social-graphics', name: 'Social Graphics', icon: <Image className="w-4 h-4" />, color: 'from-cyan-500 to-cyan-500', synced: true, lastSync: '5 min ago' },
+  { id: 'invoice-generator', name: 'Invoice Generator', icon: <FileText className="w-4 h-4" />, color: 'from-cyan-500 to-cyan-500', synced: true, lastSync: '1 hr ago' },
   { id: 'qr-generator', name: 'QR Generator', icon: <QrCode className="w-4 h-4" />, color: 'from-gray-600 to-gray-700', synced: false },
 ]
 
@@ -86,10 +86,10 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
       <div className="bg-gray-800 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Palette className="w-4 h-4 text-violet-400" />
+            <Palette className="w-4 h-4 text-cyan-400" />
             <span className="font-medium text-sm">Brand Kit</span>
           </div>
-          <button className="text-xs text-violet-400 hover:text-violet-300">Manage</button>
+          <button className="text-xs text-cyan-400 hover:text-cyan-400">Manage</button>
         </div>
         <div className="flex gap-2">
           {colors.slice(0, 4).map(color => (
@@ -112,7 +112,7 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-lg flex items-center justify-center">
               <Palette className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -123,7 +123,7 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
           <button
             onClick={syncAllApps}
             disabled={isSyncing}
-            className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 rounded-lg text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-400 hover:bg-cyan-400 disabled:opacity-50 rounded-lg text-sm transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             {isSyncing ? 'Syncing...' : 'Sync All'}
@@ -143,7 +143,7 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm transition-colors ${
               activeTab === tab.id
-                ? 'text-violet-400 border-b-2 border-violet-500 bg-violet-500/5'
+                ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-400/5'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -181,7 +181,7 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
                   </div>
                 </div>
               ))}
-              <button className="aspect-square bg-gray-800 rounded-lg border-2 border-dashed border-gray-700 hover:border-violet-500 flex items-center justify-center">
+              <button className="aspect-square bg-gray-800 rounded-lg border-2 border-dashed border-gray-700 hover:border-cyan-400 flex items-center justify-center">
                 <Upload className="w-6 h-6 text-gray-500" />
               </button>
             </div>
@@ -210,7 +210,7 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
                       onClick={() => copyToClipboard(color.value, color.id)}
                       className="p-1.5 text-gray-400 hover:text-white"
                     >
-                      {copiedId === color.id ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                      {copiedId === color.id ? <Check className="w-4 h-4 text-cyan-500" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -257,12 +257,12 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
               </div>
               <div className="flex items-center gap-3">
                 {app.synced ? (
-                  <span className="flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">
+                  <span className="flex items-center gap-1 px-2 py-1 bg-cyan-500/20 text-cyan-500 text-xs rounded">
                     <Check className="w-3 h-3" />
                     Synced
                   </span>
                 ) : (
-                  <button className="px-3 py-1 bg-violet-600 hover:bg-violet-700 text-xs rounded">
+                  <button className="px-3 py-1 bg-cyan-400 hover:bg-cyan-400 text-xs rounded">
                     Connect
                   </button>
                 )}
@@ -273,11 +273,11 @@ export default function UnifiedBrandKit({ brandName = 'My Brand', onAssetSelect,
             </div>
           ))}
 
-          <div className="p-4 bg-violet-500/10 border border-violet-500/30 rounded-lg mt-4">
+          <div className="p-4 bg-cyan-400/10 border border-cyan-400/30 rounded-lg mt-4">
             <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-violet-400 mt-0.5" />
+              <Sparkles className="w-5 h-5 text-cyan-400 mt-0.5" />
               <div>
-                <p className="font-medium text-violet-300">Auto-Sync Enabled</p>
+                <p className="font-medium text-cyan-400">Auto-Sync Enabled</p>
                 <p className="text-sm text-gray-400">Changes to your brand kit automatically sync to connected apps.</p>
               </div>
             </div>
