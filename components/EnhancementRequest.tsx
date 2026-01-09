@@ -69,7 +69,7 @@ export function EnhancementCard({ enhancement, userId, onVote, onClick }: Enhanc
             onClick={(e) => { e.stopPropagation(); handleVote(1); }}
             disabled={!userId}
             className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-              localVote === 1 ? 'text-green-600' : 'text-gray-400'
+              localVote === 1 ? 'text-cyan-500' : 'text-gray-400'
             } ${!userId ? 'opacity-50 cursor-not-allowed' : ''}`}
             title={userId ? 'Upvote' : 'Login to vote'}
           >
@@ -79,7 +79,7 @@ export function EnhancementCard({ enhancement, userId, onVote, onClick }: Enhanc
           </button>
           
           <span className={`font-bold text-lg ${
-            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-600' : 'text-gray-500'
+            voteScore > 0 ? 'text-cyan-500' : voteScore < 0 ? 'text-red-600' : 'text-gray-500'
           }`}>
             {voteScore}
           </span>
