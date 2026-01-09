@@ -260,7 +260,7 @@ export function PricingPage({
           <span className={`text-sm ${billingCycle === 'yearly' ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500'}`}>
             Yearly
           </span>
-          <span className="ml-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-medium px-2 py-1 rounded-full">
+          <span className="ml-2 bg-cyan-500 dark:bg-cyan-500 text-cyan-500 dark:text-cyan-500 text-xs font-medium px-2 py-1 rounded-full">
             Save up to 17%
           </span>
         </div>
@@ -303,7 +303,7 @@ export function PricingPage({
                     <span className="text-gray-500 dark:text-gray-400">/month</span>
                   </div>
                   {billingCycle === 'yearly' && tier.yearlyPrice > 0 && (
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                    <p className="text-sm text-cyan-500 dark:text-cyan-500 mt-1">
                       ${tier.yearlyPrice}/year (save {yearlySavings(tier)}%)
                     </p>
                   )}
@@ -319,8 +319,8 @@ export function PricingPage({
                   </div>
                   {billingCycle === 'yearly' && tier.creditsBonus && (
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-sm text-green-600 dark:text-green-400">Yearly Bonus</span>
-                      <span className="font-bold text-green-600 dark:text-green-400">
+                      <span className="text-sm text-cyan-500 dark:text-cyan-500">Yearly Bonus</span>
+                      <span className="font-bold text-cyan-500 dark:text-cyan-500">
                         +{tier.creditsBonus.toLocaleString()}
                       </span>
                     </div>
@@ -358,7 +358,7 @@ export function PricingPage({
                 <ul className="mt-6 space-y-3">
                   {tier.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-sm">
-                      <svg className="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                       <span className="text-gray-600 dark:text-gray-300">{feature}</span>
@@ -403,7 +403,7 @@ export function PricingPage({
                   </div>
                   
                   {pkg.bonus && (
-                    <div className="text-sm text-green-600 dark:text-green-400 font-medium mb-2">
+                    <div className="text-sm text-cyan-500 dark:text-cyan-500 font-medium mb-2">
                       +{pkg.bonus.toLocaleString()} bonus
                     </div>
                   )}
@@ -474,7 +474,7 @@ export function PricingPage({
         </div>
 
         {/* Enterprise CTA */}
-        <div className="mt-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 md:p-12 text-center">
+        <div className="mt-20 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-8 md:p-12 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Need a Custom Solution?
           </h2>
