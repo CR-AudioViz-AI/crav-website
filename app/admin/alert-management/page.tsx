@@ -231,9 +231,9 @@ export default function AlertManagementPage() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'warning': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'warning': return 'bg-cyan-400/20 text-cyan-400 border-cyan-400/30';
       case 'info': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'success': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'success': return 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30';
       default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
@@ -276,7 +276,7 @@ export default function AlertManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-500 to-slate-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -312,7 +312,7 @@ export default function AlertManagementPage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <Zap className="w-5 h-5 text-yellow-400" />
+                <Zap className="w-5 h-5 text-cyan-400" />
                 <span className="text-2xl font-bold text-white">{stats.active}</span>
               </div>
               <p className="text-slate-400 text-sm">Active</p>
@@ -328,7 +328,7 @@ export default function AlertManagementPage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="w-5 h-5 text-cyan-500" />
                 <span className="text-2xl font-bold text-white">{stats.resolved}</span>
               </div>
               <p className="text-slate-400 text-sm">Resolved</p>
@@ -336,7 +336,7 @@ export default function AlertManagementPage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <Clock className="w-5 h-5 text-purple-400" />
+                <Clock className="w-5 h-5 text-cyan-500" />
                 <span className="text-2xl font-bold text-white">{stats.avgResponseTime}</span>
               </div>
               <p className="text-slate-400 text-sm">Avg Response</p>
@@ -404,7 +404,7 @@ export default function AlertManagementPage() {
               alert.status === 'active' ? 'border-l-4' : 'border'
             } ${
               alert.type === 'critical' ? 'border-l-red-500 border-slate-700' :
-              alert.type === 'warning' ? 'border-l-yellow-500 border-slate-700' :
+              alert.type === 'warning' ? 'border-l-cyan-400 border-slate-700' :
               'border-slate-700'
             }`}>
               <div className="flex items-start justify-between">
@@ -412,9 +412,9 @@ export default function AlertManagementPage() {
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`p-2 rounded-lg ${
                       alert.type === 'critical' ? 'bg-red-500/20' :
-                      alert.type === 'warning' ? 'bg-yellow-500/20' :
+                      alert.type === 'warning' ? 'bg-cyan-400/20' :
                       alert.type === 'info' ? 'bg-blue-500/20' :
-                      'bg-green-500/20'
+                      'bg-cyan-500/20'
                     }`}>
                       {getTypeIcon(alert.type)}
                     </div>
@@ -449,13 +449,13 @@ export default function AlertManagementPage() {
                     <>
                       <button
                         onClick={() => handleAcknowledge(alert.id)}
-                        className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm transition-colors"
+                        className="px-3 py-1 bg-cyan-400 hover:bg-cyan-400 text-white rounded-lg text-sm transition-colors"
                       >
                         Acknowledge
                       </button>
                       <button
                         onClick={() => handleResolve(alert.id)}
-                        className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
+                        className="px-3 py-1 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg text-sm transition-colors"
                       >
                         Resolve
                       </button>
@@ -464,7 +464,7 @@ export default function AlertManagementPage() {
                   {alert.status === 'acknowledged' && (
                     <button
                       onClick={() => handleResolve(alert.id)}
-                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors"
+                      className="px-3 py-1 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg text-sm transition-colors"
                     >
                       Resolve
                     </button>
@@ -573,7 +573,7 @@ export default function AlertManagementPage() {
                     <div className="space-y-2">
                       {selectedAlert.actions_taken.map((action, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-slate-900/50 rounded-lg p-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <CheckCircle className="w-4 h-4 text-cyan-500" />
                           <span className="text-white">{action}</span>
                         </div>
                       ))}
