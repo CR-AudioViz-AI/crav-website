@@ -141,9 +141,9 @@ export default function SettingsPage() {
       </div>
 
       {message && (
-        <Card className={`mb-6 ${message.type === 'error' ? 'border-destructive' : 'border-green-500'}`}>
+        <Card className={`mb-6 ${message.type === 'error' ? 'border-destructive' : 'border-cyan-500'}`}>
           <CardContent className="pt-6">
-            <p className={message.type === 'error' ? 'text-destructive' : 'text-green-600'}>
+            <p className={message.type === 'error' ? 'text-destructive' : 'text-cyan-500'}>
               {message.text}
             </p>
           </CardContent>
