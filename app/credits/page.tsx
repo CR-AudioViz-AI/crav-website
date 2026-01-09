@@ -119,7 +119,7 @@ export default function CreditsPage() {
                 </span>
               )}
               {pack.bestValue && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-cyan-500 text-white text-xs font-bold rounded-full">
                   Best Value
                 </span>
               )}
@@ -131,7 +131,7 @@ export default function CreditsPage() {
                 </div>
                 <div className="text-sm text-gray-500 mb-4">credits</div>
                 {pack.bonus > 0 && (
-                  <div className="text-green-600 text-sm font-medium mb-2">
+                  <div className="text-cyan-500 text-sm font-medium mb-2">
                     +{pack.bonus.toLocaleString()} bonus!
                   </div>
                 )}
@@ -180,7 +180,7 @@ export default function CreditsPage() {
               {pkg.bonus > 0 && (
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600 dark:text-gray-400">Bonus Credits</span>
-                  <span className="text-green-600">+{pkg.bonus.toLocaleString()}</span>
+                  <span className="text-cyan-500">+{pkg.bonus.toLocaleString()}</span>
                 </div>
               )}
               <div className="border-t border-gray-200 dark:border-gray-600 my-3" />
@@ -235,7 +235,7 @@ export default function CreditsPage() {
             <button
               onClick={handlePurchase}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-cyan-500 disabled:opacity-50 transition-all"
             >
               {loading ? 'Processing...' : `Pay $${pkg.price} with ${paymentMethod === 'stripe' ? 'Card' : 'PayPal'}`}
             </button>
