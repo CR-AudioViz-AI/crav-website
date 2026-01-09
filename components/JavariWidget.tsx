@@ -101,7 +101,7 @@ export default function JavariWidget() {
       {!isOpen && (
         <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center z-50 group">
           <MessageCircle className="w-6 h-6 text-white" />
-          <span className="absolute -top-2 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+          <span className="absolute -top-2 -right-1 w-4 h-4 bg-cyan-500 rounded-full border-2 border-white"></span>
         </button>
       )}
       
