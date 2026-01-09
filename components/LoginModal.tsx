@@ -47,7 +47,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     { id: 'github', name: 'GitHub', bg: 'bg-gray-900 hover:bg-gray-800 text-white' },
     { id: 'apple', name: 'Apple', bg: 'bg-black hover:bg-gray-900 text-white' },
     { id: 'azure', name: 'Microsoft', bg: 'bg-blue-600 hover:bg-blue-700 text-white' },
-    { id: 'discord', name: 'Discord', bg: 'bg-indigo-600 hover:bg-indigo-700 text-white' },
+    { id: 'discord', name: 'Discord', bg: 'bg-cyan-500 hover:bg-cyan-500 text-white' },
   ];
 
   return (
