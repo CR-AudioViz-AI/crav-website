@@ -49,13 +49,13 @@ const RESOURCES = [
 ];
 
 const COLORS: Record<string, string> = {
-  purple: 'bg-purple-50 text-purple-600 border-purple-200',
-  pink: 'bg-pink-50 text-pink-600 border-pink-200',
-  green: 'bg-green-50 text-green-600 border-green-200',
+  purple: 'bg-cyan-500 text-cyan-500 border-cyan-500',
+  pink: 'bg-cyan-500 text-cyan-500 border-cyan-500',
+  green: 'bg-cyan-500 text-cyan-500 border-cyan-500',
   blue: 'bg-blue-50 text-blue-600 border-blue-200',
   red: 'bg-red-50 text-red-600 border-red-200',
-  indigo: 'bg-indigo-50 text-indigo-600 border-indigo-200',
-  yellow: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+  indigo: 'bg-cyan-500 text-cyan-500 border-cyan-500',
+  yellow: 'bg-cyan-500 text-cyan-500 border-cyan-500',
   teal: 'bg-teal-50 text-teal-600 border-teal-200',
 };
 
@@ -76,14 +76,14 @@ export default function ResourcesPage() {
       <div className="bg-white border-b py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-purple-600" />
+            <Sparkles className="w-8 h-8 text-cyan-500" />
             <h1 className="text-3xl font-bold">Free Resources</h1>
           </div>
           <p className="text-gray-600 mb-6">{total}+ curated free tools to supercharge your creativity</p>
           <div className="max-w-md mx-auto relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-2 focus:ring-purple-200 outline-none" />
+              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-2 focus:ring-cyan-500 outline-none" />
           </div>
         </div>
       </div>
@@ -109,8 +109,8 @@ export default function ResourcesPage() {
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{item.desc}</p>
                     <div className="flex gap-1">
-                      {item.free && <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Free</span>}
-                      {item.hot && <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">⭐ Hot</span>}
+                      {item.free && <span className="px-2 py-0.5 bg-cyan-500 text-cyan-500 text-xs rounded-full">Free</span>}
+                      {item.hot && <span className="px-2 py-0.5 bg-cyan-500 text-cyan-500 text-xs rounded-full">⭐ Hot</span>}
                     </div>
                   </a>
                 ))}
