@@ -287,12 +287,12 @@ export default function LandingPage() {
 
             {/* Media & Entertainment */}
             <motion.div 
-              className="bg-gray-800/70 p-6 rounded-2xl border border-red-500/30 hover:border-red-500/60 transition-all"
+              className="bg-gray-800/70 p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-500/60 transition-all"
               whileHover={{ y: -5 }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
-                  <Camera className="w-6 h-6 text-red-400" />
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-cyan-400" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold">Media & Entertainment</h3>
