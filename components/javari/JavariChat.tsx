@@ -104,7 +104,7 @@ export function JavariChat({ className, showCredits = true, userCredits = 0 }: J
   return (
     <Card className={cn("flex flex-col h-[600px] max-h-[80vh]", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-t-lg">
+      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
           <Bot className="w-6 h-6" />
           <span className="font-semibold">Javari AI</span>
@@ -129,7 +129,7 @@ export function JavariChat({ className, showCredits = true, userCredits = 0 }: J
             )}
           >
             {message.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-500 flex items-center justify-center text-white">
                 <Bot className="w-5 h-5" />
               </div>
             )}
@@ -137,7 +137,7 @@ export function JavariChat({ className, showCredits = true, userCredits = 0 }: J
               className={cn(
                 "max-w-[80%] rounded-2xl px-4 py-2",
                 message.role === "user"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-cyan-600 text-white"
                   : "bg-gray-100 text-gray-900"
               )}
             >
@@ -155,7 +155,7 @@ export function JavariChat({ className, showCredits = true, userCredits = 0 }: J
         ))}
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-500 flex items-center justify-center text-white">
               <Bot className="w-5 h-5" />
             </div>
             <div className="bg-gray-100 rounded-2xl px-4 py-3 flex items-center gap-2">
@@ -181,7 +181,7 @@ export function JavariChat({ className, showCredits = true, userCredits = 0 }: J
           <Button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading}
-            className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-500"
+            className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-500"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
