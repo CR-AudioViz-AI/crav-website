@@ -380,7 +380,7 @@ export default function ExpensesPage() {
                 <div className="space-y-3">
                   {alerts.map((alert) => (
                     <div key={alert.id} className="flex items-start gap-3 p-3 rounded-lg border">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-cyan-500 mt-0.5" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <p className="font-medium">{alert.alert_type.replace('_', ' ').toUpperCase()}</p>
