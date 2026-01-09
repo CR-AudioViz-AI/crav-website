@@ -47,7 +47,7 @@ const STATUS_OPTIONS = [
 
 const PRIORITY_OPTIONS = [
   { value: 'critical', label: 'Critical', color: 'text-red-600' },
-  { value: 'high', label: 'High', color: 'text-orange-600' },
+  { value: 'high', label: 'High', color: 'text-cyan-500' },
   { value: 'medium', label: 'Medium', color: 'text-blue-600' },
   { value: 'low', label: 'Low', color: 'text-gray-600' },
 ];
@@ -136,7 +136,7 @@ export default function NewGrantPage() {
             <div className="flex items-center gap-3">
               <Link
                 href="/admin/grants/discover"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-cyan-500 bg-cyan-500 rounded-lg hover:bg-cyan-500"
               >
                 <Sparkles className="w-4 h-4" />
                 Discover Grants
@@ -246,7 +246,7 @@ export default function NewGrantPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
+              <DollarSign className="w-5 h-5 text-cyan-500" />
               Financial Information
             </h2>
           </div>
@@ -323,7 +323,7 @@ export default function NewGrantPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-purple-600" />
+              <Calendar className="w-5 h-5 text-cyan-500" />
               Timeline & Dates
             </h2>
           </div>
@@ -416,7 +416,7 @@ export default function NewGrantPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Target className="w-5 h-5 text-orange-600" />
+              <Target className="w-5 h-5 text-cyan-500" />
               Status & Classification
             </h2>
           </div>
@@ -509,7 +509,7 @@ export default function NewGrantPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Building className="w-5 h-5 text-indigo-600" />
+              <Building className="w-5 h-5 text-cyan-500" />
               Target CRAIverse Modules
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -523,7 +523,7 @@ export default function NewGrantPage() {
                   key={module.id}
                   className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer border transition-colors ${
                     selectedModules.includes(module.id)
-                      ? 'bg-purple-50 border-purple-300'
+                      ? 'bg-cyan-500 border-cyan-500'
                       : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                   }`}
                 >
@@ -531,7 +531,7 @@ export default function NewGrantPage() {
                     type="checkbox"
                     checked={selectedModules.includes(module.id)}
                     onChange={() => toggleModule(module.id)}
-                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="rounded border-gray-300 text-cyan-500 focus:ring-cyan-500"
                   />
                   <span className="text-sm text-gray-700">{module.name}</span>
                 </label>
@@ -572,7 +572,7 @@ export default function NewGrantPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2 text-sm text-white bg-cyan-500 rounded-lg hover:bg-cyan-500 transition-colors disabled:opacity-50"
           >
             {loading ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
