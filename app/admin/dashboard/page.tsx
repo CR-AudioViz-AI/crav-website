@@ -60,7 +60,7 @@ export default function AdminDashboard() {
           <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
           {subValue && (
             <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-              {trend === "up" && <ArrowUpRight className="w-4 h-4 text-green-500" />}
+              {trend === "up" && <ArrowUpRight className="w-4 h-4 text-cyan-500" />}
               {trend === "down" && <ArrowDownRight className="w-4 h-4 text-red-500" />}
               {subValue}
             </p>
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
             title="Active Subscriptions"
             value={stats?.subscriptions.active?.toLocaleString() || 0}
             icon={CreditCard}
-            color="bg-green-500"
+            color="bg-cyan-500"
           />
           <StatCard
             title="Monthly Revenue"
@@ -134,13 +134,13 @@ export default function AdminDashboard() {
             subValue={`$${stats?.revenue.today || 0} today`}
             icon={DollarSign}
             trend="up"
-            color="bg-purple-500"
+            color="bg-cyan-500"
           />
           <StatCard
             title="Open Tickets"
             value={stats?.tickets.open || 0}
             icon={Ticket}
-            color={stats?.tickets.open && stats.tickets.open > 10 ? "bg-red-500" : "bg-orange-500"}
+            color={stats?.tickets.open && stats.tickets.open > 10 ? "bg-red-500" : "bg-cyan-500"}
           />
         </div>
 
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           
           <Link href="/admin/tickets" className="block bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <Ticket className="w-8 h-8 text-orange-500" />
+              <Ticket className="w-8 h-8 text-cyan-500" />
               <div>
                 <h3 className="font-semibold text-gray-900">Support Tickets</h3>
                 <p className="text-sm text-gray-500">{stats?.tickets.open || 0} open tickets</p>
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
           
           <Link href="/admin/billing" className="block bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <DollarSign className="w-8 h-8 text-green-500" />
+              <DollarSign className="w-8 h-8 text-cyan-500" />
               <div>
                 <h3 className="font-semibold text-gray-900">Billing & Revenue</h3>
                 <p className="text-sm text-gray-500">View transactions</p>
@@ -217,10 +217,10 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                         tx.status === "completed" 
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-cyan-500 text-cyan-500"
                           : tx.status === "failed"
                           ? "bg-red-100 text-red-800"
-                          : "bg-yellow-100 text-yellow-800"
+                          : "bg-cyan-400 text-cyan-400"
                       }`}>
                         {tx.status}
                       </span>
