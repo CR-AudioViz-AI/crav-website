@@ -18,14 +18,14 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-600 via-teal-600 to-cyan-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-500 via-teal-600 to-cyan-600 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <HelpCircle className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
               Frequently Asked Questions
             </h1>
-            <p className="text-lg md:text-xl text-green-100 mb-6 md:mb-8">
+            <p className="text-lg md:text-xl text-cyan-100 mb-6 md:mb-8">
               Quick answers to common questions about CR AudioViz AI
             </p>
             
@@ -42,7 +42,7 @@ export default function FAQPage() {
                   />
                 </div>
                 <MobileButton 
-                  className="bg-white text-green-600 hover:bg-green-50 sm:w-auto"
+                  className="bg-white text-cyan-500 hover:bg-cyan-50 sm:w-auto"
                   icon={<Search className="w-5 h-5" />}
                 >
                   <span className="sm:hidden">Search</span>
@@ -255,20 +255,20 @@ export default function FAQPage() {
             </Card>
 
             {/* Still have questions CTA */}
-            <Card className="bg-gradient-to-br from-green-600 to-teal-600 text-white border-0">
+            <Card className="bg-gradient-to-br from-cyan-500 to-teal-600 text-white border-0">
               <CardContent className="p-6 md:p-8 text-center">
                 <Mail className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4" />
                 <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">
                   Still have questions?
                 </h3>
-                <p className="text-green-100 mb-6 md:mb-8 text-base md:text-lg">
+                <p className="text-cyan-100 mb-6 md:mb-8 text-base md:text-lg">
                   Our support team is here to help you succeed
                 </p>
                 <Link href="/contact" className="inline-block w-full sm:w-auto">
                   <MobileButton 
                     size="lg"
                     fullWidth
-                    className="bg-white text-green-600 hover:bg-green-50 sm:w-auto"
+                    className="bg-white text-cyan-500 hover:bg-cyan-50 sm:w-auto"
                   >
                     Contact Support
                   </MobileButton>
