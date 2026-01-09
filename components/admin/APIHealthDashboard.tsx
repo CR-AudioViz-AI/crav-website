@@ -88,8 +88,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
 
 function StatusBadge({ status }: { status: string }) {
   const config = {
-    healthy: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', icon: CheckCircle2, label: 'Healthy' },
-    degraded: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: AlertTriangle, label: 'Degraded' },
+    healthy: { bg: 'bg-cyan-500/20', text: 'text-cyan-500', icon: CheckCircle2, label: 'Healthy' },
+    degraded: { bg: 'bg-cyan-500/20', text: 'text-cyan-500', icon: AlertTriangle, label: 'Degraded' },
     down: { bg: 'bg-red-500/20', text: 'text-red-400', icon: XCircle, label: 'Down' },
     unknown: { bg: 'bg-slate-500/20', text: 'text-slate-400', icon: Clock, label: 'Unknown' }
   }[status] || { bg: 'bg-slate-500/20', text: 'text-slate-400', icon: Clock, label: 'Unknown' };
@@ -104,12 +104,12 @@ function StatusBadge({ status }: { status: string }) {
 
 function APICard({ api, expanded, onToggle }: { api: HealthCheckResult; expanded: boolean; onToggle: () => void; }) {
   const statusColors = {
-    healthy: 'border-emerald-500/30 bg-emerald-500/5',
-    degraded: 'border-amber-500/30 bg-amber-500/5',
+    healthy: 'border-cyan-500/30 bg-cyan-500/5',
+    degraded: 'border-cyan-500/30 bg-cyan-500/5',
     down: 'border-red-500/30 bg-red-500/5',
     unknown: 'border-slate-500/30 bg-slate-500/5'
   };
-  const latencyColor = api.latencyMs < 500 ? 'text-emerald-400' : api.latencyMs < 2000 ? 'text-amber-400' : 'text-red-400';
+  const latencyColor = api.latencyMs < 500 ? 'text-cyan-500' : api.latencyMs < 2000 ? 'text-cyan-500' : 'text-red-400';
 
   return (
     <div className={`rounded-xl border ${statusColors[api.status]} backdrop-blur-sm overflow-hidden transition-all duration-200`}>
@@ -122,7 +122,7 @@ function APICard({ api, expanded, onToggle }: { api: HealthCheckResult; expanded
             <div className="flex items-center gap-2">
               <span className="font-medium text-white">{api.displayName}</span>
               {api.isCritical && <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400 rounded">Critical</span>}
-              {api.isFree && <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 rounded">Free</span>}
+              {api.isFree && <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-500 rounded">Free</span>}
             </div>
             <span className="text-xs text-slate-400">{api.category}</span>
           </div>
@@ -143,7 +143,7 @@ function APICard({ api, expanded, onToggle }: { api: HealthCheckResult; expanded
           <div><span className="text-slate-400 block text-xs mb-1">Last Checked</span><span className="text-white">{new Date(api.lastChecked).toLocaleTimeString()}</span></div>
           {api.quotaRemaining !== undefined && <div><span className="text-slate-400 block text-xs mb-1">Quota</span><span className="text-white font-mono">{api.quotaRemaining.toLocaleString()}{api.quotaLimit && ` / ${api.quotaLimit.toLocaleString()}`}</span></div>}
           {api.failoverGroup && <div><span className="text-slate-400 block text-xs mb-1">Failover Group</span><span className="text-cyan-400 font-mono text-xs">{api.failoverGroup}</span></div>}
-          {api.freeAnnualValue > 0 && <div><span className="text-slate-400 block text-xs mb-1">Annual Value</span><span className="text-emerald-400 font-medium">${api.freeAnnualValue.toLocaleString()}/year</span></div>}
+          {api.freeAnnualValue > 0 && <div><span className="text-slate-400 block text-xs mb-1">Annual Value</span><span className="text-cyan-500 font-medium">${api.freeAnnualValue.toLocaleString()}/year</span></div>}
         </div>
       )}
     </div>
@@ -222,8 +222,8 @@ export default function APIHealthDashboard() {
   }, {} as Record<string, HealthCheckResult[]>);
 
   const statusConfig = {
-    operational: { bg: 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/30', text: 'text-emerald-400', label: '✅ All Systems Operational' },
-    degraded: { bg: 'bg-gradient-to-r from-amber-500/20 to-amber-600/10', border: 'border-amber-500/30', text: 'text-amber-400', label: '⚠️ Some Systems Degraded' },
+    operational: { bg: 'bg-gradient-to-r from-cyan-500/20 to-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-500', label: '✅ All Systems Operational' },
+    degraded: { bg: 'bg-gradient-to-r from-cyan-500/20 to-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-500', label: '⚠️ Some Systems Degraded' },
     major_outage: { bg: 'bg-gradient-to-r from-red-500/20 to-red-600/10', border: 'border-red-500/30', text: 'text-red-400', label: '🚨 Major Outage Detected' }
   };
   const currentStatus = data ? statusConfig[data.overall] : statusConfig.operational;
@@ -257,8 +257,8 @@ export default function APIHealthDashboard() {
                 <p className="text-slate-400 mt-1 text-sm">{data.criticalStatus}</p>
               </div>
               <div className="flex items-center gap-6 text-sm">
-                <div className="text-center"><span className="text-2xl font-bold text-emerald-400">{data.healthy}</span><span className="text-slate-400 block">Healthy</span></div>
-                <div className="text-center"><span className="text-2xl font-bold text-amber-400">{data.degraded}</span><span className="text-slate-400 block">Degraded</span></div>
+                <div className="text-center"><span className="text-2xl font-bold text-cyan-500">{data.healthy}</span><span className="text-slate-400 block">Healthy</span></div>
+                <div className="text-center"><span className="text-2xl font-bold text-cyan-500">{data.degraded}</span><span className="text-slate-400 block">Degraded</span></div>
                 <div className="text-center"><span className="text-2xl font-bold text-red-400">{data.down}</span><span className="text-slate-400 block">Down</span></div>
               </div>
             </div>
@@ -268,9 +268,9 @@ export default function APIHealthDashboard() {
         {data && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <SummaryCard label="Total APIs" value={data.totalApis} icon={Activity} color="border-slate-700 bg-slate-800/50" />
-            <SummaryCard label="Avg Latency" value={`${data.avgLatencyMs}ms`} icon={Clock} color={data.avgLatencyMs < 500 ? "border-emerald-500/30 bg-emerald-500/10" : "border-amber-500/30 bg-amber-500/10"} />
+            <SummaryCard label="Avg Latency" value={`${data.avgLatencyMs}ms`} icon={Clock} color={data.avgLatencyMs < 500 ? "border-cyan-500/30 bg-cyan-500/10" : "border-cyan-500/30 bg-cyan-500/10"} />
             <SummaryCard label="Free APIs Value" value={`$${data.freeApisValue.toLocaleString()}`} icon={DollarSign} color="border-cyan-500/30 bg-cyan-500/10" subtext="per year" />
-            <SummaryCard label="Uptime" value={`${Math.round((data.healthy / data.totalApis) * 100)}%`} icon={CheckCircle2} color="border-emerald-500/30 bg-emerald-500/10" />
+            <SummaryCard label="Uptime" value={`${Math.round((data.healthy / data.totalApis) * 100)}%`} icon={CheckCircle2} color="border-cyan-500/30 bg-cyan-500/10" />
           </div>
         )}
 
