@@ -30,14 +30,14 @@ export default function TutorialsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-500 via-cyan-500 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <Video className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Video Tutorials
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
+            <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8">
               Learn to master CR AudioViz AI with step-by-step guides
             </p>
             <div className="max-w-2xl mx-auto">
@@ -64,7 +64,7 @@ export default function TutorialsPage() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-3 rounded-lg font-medium whitespace-nowrap transition-all flex-shrink-0 text-sm ${
                   selectedCategory === category
-                    ? 'bg-purple-600 text-white shadow-lg'
+                    ? 'bg-cyan-500 text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -82,7 +82,7 @@ export default function TutorialsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredTutorials.map((tutorial, index) => (
                 <Card key={index} className="hover:shadow-lg transition-all cursor-pointer">
-                  <div className="h-40 md:h-48 bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center relative">
+                  <div className="h-40 md:h-48 bg-gradient-to-br from-cyan-500 to-cyan-500 flex items-center justify-center relative">
                     <Play className="w-12 h-12 md:w-16 md:h-16 text-white/50" />
                     <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
                       {tutorial.duration}
@@ -90,7 +90,7 @@ export default function TutorialsPage() {
                   </div>
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
+                      <span className="px-2 py-1 bg-cyan-500 text-cyan-500 text-xs font-semibold rounded">
                         {tutorial.category}
                       </span>
                       <span className="text-xs text-gray-500">{tutorial.level}</span>
@@ -120,15 +120,15 @@ export default function TutorialsPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-500 to-cyan-500 text-white">
         <div className="container mx-auto text-center">
           <BookOpen className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Want More Help?</h2>
-          <p className="text-base md:text-lg text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-cyan-500 mb-6 md:mb-8 max-w-2xl mx-auto">
             Check out our knowledge base for detailed documentation
           </p>
           <Link href="/knowledge-base" className="inline-block">
-            <MobileButton size="lg" className="bg-white text-purple-600 hover:bg-purple-50">
+            <MobileButton size="lg" className="bg-white text-cyan-500 hover:bg-cyan-500">
               Browse Documentation
             </MobileButton>
           </Link>
