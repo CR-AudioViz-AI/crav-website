@@ -16,14 +16,14 @@ export default function VotingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-500 via-cyan-500 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <Vote className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Community Voting
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
+            <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8">
               Vote for your favorite apps, tools, and games
             </p>
           </div>
@@ -35,7 +35,7 @@ export default function VotingPage() {
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8 flex items-center gap-2">
-              <Trophy className="w-8 h-8 text-yellow-500" /> Top Voted This Week
+              <Trophy className="w-8 h-8 text-cyan-400" /> Top Voted This Week
             </h2>
             
             <div className="space-y-4">
@@ -44,7 +44,7 @@ export default function VotingPage() {
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-white ${
-                        index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-600' : 'bg-gray-300'
+                        index === 0 ? 'bg-cyan-400' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-cyan-500' : 'bg-gray-300'
                       }`}>
                         {index + 1}
                       </div>
@@ -53,11 +53,11 @@ export default function VotingPage() {
                         <p className="text-xs text-gray-500">{item.category}</p>
                       </div>
                       <div className="text-right">
-                        <div className="flex items-center gap-1 text-purple-600 font-bold">
+                        <div className="flex items-center gap-1 text-cyan-500 font-bold">
                           <ThumbsUp className="w-4 h-4" />
                           <span className="text-sm md:text-base">{item.votes.toLocaleString()}</span>
                         </div>
-                        <span className="text-xs text-green-600">{item.trend}</span>
+                        <span className="text-xs text-cyan-500">{item.trend}</span>
                       </div>
                       <MobileButton size="sm" variant="outline">
                         Vote
@@ -72,15 +72,15 @@ export default function VotingPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-500 to-cyan-500 text-white">
         <div className="container mx-auto text-center">
           <Star className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Submit Your Creation</h2>
-          <p className="text-base md:text-lg text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-cyan-500 mb-6 md:mb-8 max-w-2xl mx-auto">
             Get your app, tool, or game featured in community voting
           </p>
           <Link href="/marketplace" className="inline-block">
-            <MobileButton size="lg" className="bg-white text-purple-600 hover:bg-purple-50">
+            <MobileButton size="lg" className="bg-white text-cyan-500 hover:bg-cyan-500">
               Submit to Marketplace
             </MobileButton>
           </Link>
