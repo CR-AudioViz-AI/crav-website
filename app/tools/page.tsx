@@ -97,11 +97,11 @@ export default function ToolsPage() {
   const getColorClasses = (color: string) => {
     const colors: Record<string, { bg: string; text: string; border: string; hover: string }> = {
       blue: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200', hover: 'hover:bg-blue-100' },
-      green: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200', hover: 'hover:bg-green-100' },
-      purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200', hover: 'hover:bg-purple-100' },
+      green: { bg: 'bg-green-50', text: 'text-cyan-500', border: 'border-cyan-500', hover: 'hover:bg-cyan-500' },
+      purple: { bg: 'bg-purple-50', text: 'text-cyan-500', border: 'border-cyan-500', hover: 'hover:bg-cyan-500' },
       red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200', hover: 'hover:bg-red-100' },
-      orange: { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-200', hover: 'hover:bg-orange-100' },
-      pink: { bg: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200', hover: 'hover:bg-pink-100' },
+      orange: { bg: 'bg-orange-50', text: 'text-cyan-500', border: 'border-cyan-500', hover: 'hover:bg-cyan-500' },
+      pink: { bg: 'bg-pink-50', text: 'text-cyan-500', border: 'border-cyan-500', hover: 'hover:bg-cyan-500' },
     };
     return colors[color] || colors.blue;
   };
@@ -111,13 +111,13 @@ export default function ToolsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-blue-600 via-cyan-500 to-cyan-500 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
               {totalTools}+ Creative Tools
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8">
+            <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8">
               Everything you need to create, design, and build - all powered by AI
             </p>
             <MobileInput
@@ -157,8 +157,8 @@ export default function ToolsPage() {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Share2 className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Share2 className="w-5 h-5 text-cyan-500" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm md:text-base">Host or Export</p>
@@ -166,8 +166,8 @@ export default function ToolsPage() {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Download className="w-5 h-5 text-purple-600" />
+                  <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Download className="w-5 h-5 text-cyan-500" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm md:text-base">Full Control</p>
@@ -248,12 +248,12 @@ export default function ToolsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-500 to-cyan-500 text-white">
         <div className="container mx-auto text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             Ready to Start Creating?
           </h2>
-          <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-cyan-500 mb-6 md:mb-8 max-w-2xl mx-auto">
             Access all {totalTools}+ tools with a Creative Pro subscription
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -261,7 +261,7 @@ export default function ToolsPage() {
               <MobileButton 
                 size="lg" 
                 fullWidth
-                className="bg-white text-purple-600 hover:bg-purple-50"
+                className="bg-white text-cyan-500 hover:bg-purple-50"
               >
                 Start Free Trial
               </MobileButton>
