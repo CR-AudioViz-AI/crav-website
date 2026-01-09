@@ -173,7 +173,7 @@ export function JavariWidget({
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" style={{ minHeight: "300px" }}>
               {messages.length === 0 && (
                 <div className="text-center py-8">
-                  <Sparkles className="w-12 h-12 mx-auto text-blue-500 mb-3" />
+                  <Sparkles className="w-12 h-12 mx-auto text-cyan-500 mb-3" />
                   <p className="text-gray-600 font-medium">Hi! I am Javari 👋</p>
                   <p className="text-gray-500 text-sm mt-1">How can I help you today?</p>
                   <div className="mt-4 space-y-2">
@@ -198,7 +198,7 @@ export function JavariWidget({
                   <div
                     className={`max-w-[80%] px-4 py-2 rounded-2xl ${
                       msg.role === "user"
-                        ? "bg-blue-500 text-white rounded-br-md"
+                        ? "bg-cyan-500 text-white rounded-br-md"
                         : "bg-white border shadow-sm rounded-bl-md"
                     }`}
                   >
@@ -210,18 +210,18 @@ export function JavariWidget({
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-white border shadow-sm px-4 py-3 rounded-2xl rounded-bl-md">
-                    <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                    <Loader2 className="w-5 h-5 animate-spin text-cyan-500" />
                   </div>
                 </div>
               )}
 
               {showTicketPrompt && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <p className="text-sm text-blue-800 mb-3">Would you like to create a support ticket for personalized help?</p>
+                <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4">
+                  <p className="text-sm text-slate-800 mb-3">Would you like to create a support ticket for personalized help?</p>
                   <div className="flex gap-2">
                     <button
                       onClick={createTicket}
-                      className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600"
+                      className="flex items-center gap-2 px-3 py-2 bg-cyan-500 text-white text-sm rounded-lg hover:bg-cyan-600"
                     >
                       <Ticket className="w-4 h-4" />
                       Create Ticket
@@ -249,7 +249,7 @@ export function JavariWidget({
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask Javari anything..."
-                  className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   disabled={isLoading}
                 />
                 <button
