@@ -369,7 +369,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
       
       {/* Success Display */}
       {success && (
-        <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm">
+        <div className="p-3 bg-cyan-500 dark:bg-cyan-500/20 text-cyan-500 dark:text-cyan-500 rounded-lg text-sm">
           {success}
         </div>
       )}
@@ -549,7 +549,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
           <button
             type="submit"
             disabled={loading === 'magic_link'}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-xl font-medium hover:from-cyan-500 hover:to-cyan-500 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
             data-testid="auth-provider-magic_link"
           >
             {loading === 'magic_link' ? (
@@ -583,7 +583,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
           <button
             type="submit"
             disabled={loading === 'phone'}
-            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-xl font-medium hover:from-cyan-500 hover:to-cyan-500 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
             data-testid="auth-provider-phone"
           >
             {loading === 'phone' ? (
@@ -617,7 +617,7 @@ export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: Au
           <button
             type="submit"
             disabled={loading === 'phone_verify'}
-            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-xl font-medium hover:from-cyan-500 hover:to-cyan-500 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
             data-testid="auth-provider-phone-verify"
           >
             {loading === 'phone_verify' ? (
