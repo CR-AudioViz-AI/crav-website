@@ -71,7 +71,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          # cache: 'npm' # Disabled - no lock file in repo
 
       - name: 📦 Install dependencies
         run: |
@@ -297,3 +297,4 @@ jobs:
           fi
           
           echo "Brand audit complete"
+
