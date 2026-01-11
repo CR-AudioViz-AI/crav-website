@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "e2e": "playwright test",
-    "e2e:report": "playwright show-report"
+    "e2e:report": "playwright show-report",
+    "audit:brand": "node scripts/audit-brand-e2e.js",
+    "audit:brand:ci": "bash scripts/ci-brand-audit.sh",
+    "audit:brand:quick": "MAX_DEPTH=1 MAX_PAGES=20 node scripts/audit-brand-e2e.js",
+    "audit:brand:full": "MAX_DEPTH=5 MAX_PAGES=200 node scripts/audit-brand-e2e.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

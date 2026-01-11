@@ -34,3 +34,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Brand Audit outputs (generated)
+evidence/brand-audit/screenshots/*.png
+evidence/brand-audit/brand-audit-results.json
+reports/BRAND_AUDIT_REPORT_*.md
+!evidence/brand-audit/.gitkeep
+!evidence/brand-audit/screenshots/.gitkeep
+!reports/.gitkeep
