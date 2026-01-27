@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { headers } from 'next/headers'
+import { verifyNoRefundMetadata } from '@/lib/payments/no-refund-policy'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia'
@@ -54,6 +55,38 @@ export async function POST(request: NextRequest) {
           
           const userId = subscription.metadata.user_id
           const planId = subscription.metadata.plan_id as 'creator' | 'pro'
+          
+          // NO-REFUND POLICY ENFORCEMENT GATE
+          const metadataCheck = verifyNoRefundMetadata(
+            (session.metadata ?? {}) as Record<string, string>
+          )
+
+          if (!metadataCheck.ok) {
+            console.error(
+              'NO_REFUND_POLICY_VIOLATION',
+              metadataCheck.reason,
+              session.id
+            )
+
+            await supabase.from('policy_audit_log').insert({
+              event_type: 'violation',
+              user_id: userId ?? null,
+              stripe_session_id: session.id,
+              stripe_subscription_id: subscription.id,
+              metadata_snapshot: session.metadata,
+              violation_reason: metadataCheck.reason
+            })
+
+            if (subscription.id) {
+              await supabase
+                .from('subscriptions')
+                .update({ requires_manual_review: true })
+                .eq('stripe_subscription_id', subscription.id)
+            }
+
+            return NextResponse.json({ received: true })
+          }
+          // END NO-REFUND POLICY GATE
           
           if (userId && planId) {
             // Create subscription record
