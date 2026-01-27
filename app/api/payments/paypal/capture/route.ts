@@ -6,6 +6,9 @@ import { NextRequest, NextResponse } from 'next/server';
 // Force dynamic rendering - this route uses request.url
 export const dynamic = 'force-dynamic';
 import { createClient } from '@supabase/supabase-js';
+import {
+  verifyNoRefundMetadata
+} from '@/lib/payments/no-refund-policy';
 
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || '';
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
@@ -95,6 +98,30 @@ export async function GET(request: NextRequest) {
     const amountPaid = parseFloat(captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || '0');
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+    // NO-REFUND POLICY ENFORCEMENT GATE
+    const metadataCheck = verifyNoRefundMetadata(
+      orderData as Record<string, string>
+    );
+
+    if (!metadataCheck.ok) {
+      console.error(
+        'NO_REFUND_POLICY_VIOLATION (PayPal Capture)',
+        metadataCheck.reason,
+        token
+      );
+
+      await supabase.from('policy_audit_log').insert({
+        event_type: 'violation',
+        user_id: userId ?? null,
+        paypal_order_id: token,
+        metadata_snapshot: orderData,
+        violation_reason: metadataCheck.reason
+      });
+
+      return NextResponse.redirect(`${BASE_URL}/checkout/error?reason=policy_violation`);
+    }
+    // END NO-REFUND POLICY GATE
 
     // Provision based on purchase type
     if (credits && userId) {
